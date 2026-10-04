@@ -1,0 +1,59 @@
+info:
+  name: confirm-otp
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{general_url}}/confirm-otp"
+  body:
+    type: multipart-form
+    data:
+      - name: phone_code
+        type: text
+        value: "+20"
+        description: كود الدولة الذي أُرسل إليه رمز التحقق.
+      - name: phone
+        type: text
+        value: "1012345678"
+        description: رقم الهاتف نفسه المستخدم في send-otp.
+      - name: code
+        type: text
+        value: "1234"
+        description: رمز OTP المؤقت المكوّن من 4 أرقام.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## الغرض
+  التحقق من رمز الهاتف الذي تم تجهيزه عبر send-otp.
+  يجب تأكيد الرقم بنجاح قبل استدعاء register.
+  هذا endpoint عام ولا يتطلب تسجيل الدخول.
+
+  ## عنوان الطلب
+  POST {{general_url}}/confirm-otp
+  قيمة general_url الحالية في المجموعة: http://127.0.0.1:8000/api
+
+  ## Body (multipart-form)
+  كل الحقول التالية مطلوبة:
+
+  - phone_code (text): كود الدولة المستخدم في send-otp. مثال: +20.
+  - phone (text): رقم الهاتف نفسه المستخدم في send-otp، أرقام فقط من 6 إلى 20 رقمًا. مثال: 1012345678.
+  - code (text): رمز تحقق من 4 أرقام. الرمز الثابت المؤقت حاليًا هو 1234.
+
+  لا توجد حقول Enum في هذا الطلب.
+  الرمز صالح لمدة 5 دقائق، وبعدها يجب استدعاء send-otp مرة أخرى.
+  الحد الأقصى لمحاولات التأكيد هو 5، والمسار محدد بعشر محاولات في الدقيقة.
+
+  ## النتيجة
+  عند النجاح يعيد الرد verified=true ووقت انتهاء مهلة إكمال التسجيل.
+  بعد ذلك أرسل بيانات المستخدم إلى POST {{general_url}}/register.
+  التأكيد وحده لا ينشئ حساب المستخدم.
+
+  عند فشل التحقق يعيد الخادم HTTP 422 مع رسالة مترجمة تحت errors.code.

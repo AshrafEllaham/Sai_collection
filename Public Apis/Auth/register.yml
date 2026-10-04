@@ -1,0 +1,70 @@
+info:
+  name: register
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{general_url}}/register"
+  body:
+    type: multipart-form
+    data:
+      - name: phone_code
+        type: text
+        value: "+20"
+        description: كود الدولة بصيغة دولية، مثل +20.
+      - name: phone
+        type: text
+        value: "1012345678"
+        description: رقم الهاتف دون كود الدولة.
+      - name: email
+        type: text
+        value: new.user@example.com
+      - name: password
+        type: text
+        value: StrongPass123
+      - name: password_confirmation
+        type: text
+        value: StrongPass123
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## الغرض
+  إنشاء حساب مستخدم جديد. الطلب عام ولا يتطلب تسجيل الدخول أو Authorization.
+
+  ## عنوان الطلب
+  POST {{general_url}}/register
+  قيمة general_url الحالية في المجموعة: http://127.0.0.1:8000/api
+
+  ## Body (multipart-form)
+  كل الحقول التالية مطلوبة:
+
+  - phone_code (text): كود اتصال الدولة بصيغة دولية يبدأ بعلامة +، من 1 إلى 4 أرقام بعد العلامة. مثال: +20.
+  - phone (text): رقم الهاتف دون كود الدولة، أرقام فقط من 6 إلى 20 رقمًا، ويجب ألا يكون مسجلًا مسبقًا مع كود الدولة نفسه. مثال: 1012345678.
+  - email (text): بريد إلكتروني صحيح وغير مستخدم من قبل. يُزال الفراغ المحيط ويُحوّل إلى أحرف صغيرة قبل الحفظ.
+  - password (text): كلمة المرور، من 8 إلى 255 حرفًا.
+  - password_confirmation (text): تأكيد كلمة المرور؛ يجب أن يطابق password تمامًا.
+
+  قيم Body أمثلة قابلة للتعديل قبل الإرسال، وليست بيانات حساب ثابتة.
+  لا توجد حقول Enum في هذا الطلب.
+
+  يجب استدعاء send-otp ثم confirm-otp بنجاح قبل إرسال هذا الطلب.
+  استخدم phone_code وphone نفسيهما في طلبات OTP والتسجيل.
+  لا يُنشأ الحساب إذا لم يكن تأكيد OTP صالحًا.
+
+  ## النتيجة
+  عند النجاح يُنشأ الحساب بعد تأكيد رقم الهاتف.
+  يعيد الرد بيانات الحساب الأساسية ومعرّفه وحالته النشطة.
+  لا يعيد الرد كلمة المرور أو قيمة OTP نفسها.
+
+  عند فشل التحقق يعيد الخادم HTTP 422 مع message وerrors مفهرسة باسم الحقل.
+  مثال: خطأ phone أو email إذا كان مسجلًا بالفعل.
+  مثال: خطأ password إذا لم يطابق التأكيد.
+  رسائل التحقق مترجمة حسب اللغة المحددة للطلب.

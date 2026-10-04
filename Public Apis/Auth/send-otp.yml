@@ -1,0 +1,55 @@
+info:
+  name: send-otp
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{general_url}}/send-otp"
+  body:
+    type: multipart-form
+    data:
+      - name: phone_code
+        type: text
+        value: "+20"
+        description: كود الدولة بصيغة دولية، مثل +20.
+      - name: phone
+        type: text
+        value: "1012345678"
+        description: رقم الهاتف دون كود الدولة.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## الغرض
+  تجهيز رمز تحقق لرقم هاتف قبل التسجيل.
+  هذا endpoint عام ولا يتطلب تسجيل الدخول.
+
+  ## عنوان الطلب
+  POST {{general_url}}/send-otp
+  قيمة general_url الحالية في المجموعة: http://127.0.0.1:8000/api
+
+  ## Body (multipart-form)
+  كل الحقول التالية مطلوبة:
+
+  - phone_code (text): كود اتصال الدولة بصيغة دولية يبدأ بعلامة +، من 1 إلى 4 أرقام بعد العلامة. مثال: +20.
+  - phone (text): رقم الهاتف دون كود الدولة، أرقام فقط من 6 إلى 20 رقمًا. مثال: 1012345678.
+
+  ## الرمز المؤقت
+  أثناء التطوير، رمز OTP ثابت ويساوي 1234.
+  لا يوجد تكامل SMS حاليًا، لذلك لا يُرسل الرمز إلى الهاتف فعليًا.
+  لا توجد حقول Enum في هذا الطلب.
+
+  ## النتيجة
+  عند النجاح يعيد الرد وقت انتهاء صلاحية الرمز.
+  الرمز صالح لمدة 5 دقائق.
+  إعادة الإرسال تلغي أي رمز تسجيل سابق غير مستهلك لهذا الرقم.
+  الطلب محدد بثلاث محاولات في الدقيقة.
+
+  عند فشل التحقق يعيد الخادم HTTP 422 مع message وerrors مفهرسة باسم الحقل.
