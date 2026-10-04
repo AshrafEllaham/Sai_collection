@@ -1,0 +1,59 @@
+info:
+  name: update-preferences
+  type: http
+  seq: 6
+
+http:
+  method: PUT
+  url: "{{general_url}}/notifications/preferences"
+  body:
+    type: json
+    data: |-
+      {
+        "orders_enabled": true,
+        "pickup_enabled": true,
+        "returns_enabled": true,
+        "chats_enabled": true,
+        "offers_enabled": false
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  تحديث تفضيلات إشعارات الحساب الحالي.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب user أو store.
+
+  ## Body (JSON)
+
+  - orders_enabled (boolean): مطلوب. إشعارات الطلبات.
+
+  - pickup_enabled (boolean): مطلوب. إشعارات الاستلام.
+
+  - returns_enabled (boolean): مطلوب. إشعارات الاسترجاع.
+
+  - chats_enabled (boolean): مطلوب. إشعارات المحادثات.
+
+  - offers_enabled (boolean): مطلوب. إشعارات العروض.
+
+  لا توجد حقول Enum في هذا الطلب.
+
+  ## الاستجابة
+
+  يعيد التفضيلات المحفوظة.
+
+  ## الأخطاء
+
+  HTTP 401 عند غياب التوكن.
+
+  HTTP 422 عند غياب أي حقل أو إرسال قيمة ليست boolean.

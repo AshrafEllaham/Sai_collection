@@ -1,0 +1,73 @@
+info:
+  name: update-profile
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{user_ur}}/profile"
+  body:
+    type: multipart-form
+    data:
+      - name: name
+        type: text
+        value: أحمد حسن
+        description: "مطلوب. اسم المستخدم من حرفين إلى 255 حرفًا."
+      - name: image
+        type: file
+        value: []
+        contentType: image/jpeg
+        description: "مطلوب. صورة JPG أو JPEG أو PNG أو WEBP بحد أقصى 5MB."
+      - name: address
+        type: text
+        value: مدينة نصر، القاهرة
+        description: "اختياري. عنوان المستخدم بحد أقصى 500 حرف."
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  إنشاء أو تحديث بيانات الملف الشخصي لحساب من النوع user.
+
+  ## عنوان الطلب
+
+  POST {{user_ur}}/profile
+
+  قيمة user_ur الحالية في المجموعة: http://127.0.0.1:8000/api/user
+
+  ## المصادقة
+
+  الطلب محمي ويتطلب Bearer token صالحًا لحساب نوعه user.
+
+  يعيد endpoint التسجيل access_token يمكن وضعه في متغير المجموعة access_token.
+
+  ## Body (multipart-form)
+
+  - name (text): مطلوب. اسم المستخدم، من حرفين إلى 255 حرفًا.
+
+  - image (file): مطلوب. الصورة الشخصية. الصيغ المسموحة JPG وJPEG وPNG وWEBP، بحد أقصى 5MB.
+
+  - address (text): اختياري. العنوان، بحد أقصى 500 حرف.
+
+  حذف address من الطلب يبقي العنوان الحالي دون تغيير.
+
+  لا توجد حقول Enum في هذا الطلب.
+
+  ## الاستجابة الناجحة
+
+  يعيد الخادم HTTP 200 مع id وname ومسار image وaddress الحالي.
+
+  ## أخطاء مهمة
+
+  يعيد الخادم HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  يعيد الخادم HTTP 422 عند غياب الاسم أو الصورة، أو عند إرسال ملف غير مدعوم.
+
+  يعيد الخادم HTTP 422 عندما لا يكون نوع الحساب user.

@@ -26,7 +26,17 @@ http:
       - name: password_confirmation
         type: text
         value: StrongPass123
-  auth: inherit
+
+runtime:
+  actions:
+    - type: set-variable
+      phase: after-response
+      selector:
+        expression: res.body.data.access_token
+        method: jsonq
+      variable:
+        name: access_token
+        scope: runtime
 
 settings:
   encodeUrl: true
@@ -62,6 +72,7 @@ docs: |-
   ## النتيجة
   عند النجاح يُنشأ الحساب بعد تأكيد رقم الهاتف.
   يعيد الرد بيانات الحساب الأساسية ومعرّفه وحالته النشطة.
+  يعيد access_token من نوع bearer، وتحفظه المجموعة تلقائيًا في متغير runtime باسم access_token.
   لا يعيد الرد كلمة المرور أو قيمة OTP نفسها.
 
   عند فشل التحقق يعيد الخادم HTTP 422 مع message وerrors مفهرسة باسم الحقل.

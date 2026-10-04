@@ -1,0 +1,33 @@
+info:
+  name: mark-all-as-read
+  type: http
+  seq: 3
+
+http:
+  method: PATCH
+  url: "{{general_url}}/notifications/read-all"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  تحديد كل إشعارات الحساب الحالي غير المقروءة كمقروءة.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب user أو store.
+
+  ## الاستجابة
+
+  يعيد updated بعدد الإشعارات التي تم تحديثها.
+
+  ## الأخطاء
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.

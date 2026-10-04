@@ -1,0 +1,39 @@
+info:
+  name: mark-as-read
+  type: http
+  seq: 2
+
+http:
+  method: PATCH
+  url: "{{general_url}}/notifications/00000000-0000-0000-0000-000000000000/read"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  تحديد إشعار واحد يخص الحساب الحالي كمقروء.
+
+  ## Path Parameters
+
+  - notification (UUID): مطلوب. معرّف الإشعار المراد تحديثه.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب user أو store.
+
+  ## الاستجابة
+
+  يعيد بيانات الإشعار بعد تحديث is_read وread_at.
+
+  ## الأخطاء
+
+  HTTP 401 عند غياب التوكن.
+
+  HTTP 404 إذا لم يوجد الإشعار أو كان يخص حسابًا آخر.

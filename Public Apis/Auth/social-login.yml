@@ -1,0 +1,84 @@
+info:
+  name: social-login
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{general_url}}/social-login"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  body:
+    type: multipart-form
+    data:
+      - name: social_id
+        type: text
+        value: PROVIDER_SUBJECT_ID
+        description: المعرّف الثابت الذي أعاده مزود تسجيل الدخول الاجتماعي.
+      - name: email
+        type: text
+        value: existing.user@example.com
+        description: بريد إلكتروني صحيح ومطلوب؛ يُستخدم للعثور على حساب موجود عند عدم تطابق social_id.
+      - name: name
+        type: text
+        value: ahmed mohamed
+        description: اسم المستخدم. اختياري عند تسجيل الدخول لحساب موجود، ويُحفظ عند إنشاء حساب جديد.
+
+runtime:
+  actions:
+    - type: set-variable
+      phase: after-response
+      selector:
+        expression: res.body.data.access_token
+        method: jsonq
+      variable:
+        name: access_token
+        scope: runtime
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## الغرض
+
+  تسجيل الدخول أو إنشاء حساب مستخدم باستخدام social_id الذي أعاده مزود تسجيل الدخول الاجتماعي.
+
+  ## المصادقة
+
+  الطلب عام ولا يتطلب access token.
+
+  ## عنوان الطلب
+
+  POST {{general_url}}/social-login
+  قيمة general_url الحالية في المجموعة: http://127.0.0.1:8000/api
+
+  ## Body (multipart-form)
+
+  - social_id (text، مطلوب): المعرّف الثابت الذي أعاده Google أو Apple.
+  - email (text، مطلوب): بريد إلكتروني صحيح. إذا لم يوجد مستخدم بهذا social_id، يبحث الخادم عن مستخدم بهذا البريد قبل إنشاء حساب.
+  - name (text، اختياري): اسم المستخدم؛ يُستخدم عند إنشاء حساب جديد.
+
+  تُحذف المسافات من بداية ونهاية email ويُحوّل إلى أحرف صغيرة قبل المعالجة.
+
+  لا ترسل phone أو phone_code في هذا الطلب حاليًا؛ حقول الطلب لا تتحقق منهما، لذلك لن يصلا إلى منطق تسجيل الدخول.
+
+  يطبق الخادم حدًا أقصى قدره 10 محاولات في الدقيقة.
+
+  ## النتيجة
+
+  إذا تطابق social_id مع مستخدم موجود، يسجل دخوله.
+
+  إذا لم يتطابق social_id، يبحث عن مستخدم بالبريد ويسجل الدخول إليه. لا يربط التنفيذ الحالي social_id الجديد بالحساب الموجود.
+
+  إذا لم يوجد مستخدم بالبريد، ينشئ حسابًا نشطًا بالاسم والبريد وsocial_id.
+
+  يعيد الرد بيانات المستخدم وaccess_token من نوع bearer. تحفظ المجموعة الرمز تلقائيًا في runtime variable باسم access_token.
+
+  إذا كان social_id أو email مفقودًا أو غير صالح، يعيد الخادم HTTP 422 مع message وerrors. رسائل التحقق مترجمة حسب لغة Accept-Language.

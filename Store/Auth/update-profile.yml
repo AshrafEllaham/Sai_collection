@@ -1,0 +1,98 @@
+info:
+  name: update-profile
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{store_url}}/profile"
+  body:
+    type: multipart-form
+    data:
+      - name: name
+        type: text
+        value: متجر سعي
+        description: "مطلوب. اسم المتجر من حرفين إلى 255 حرفًا."
+      - name: image
+        type: file
+        value: []
+        contentType: image/jpeg
+        description: "مطلوب. صورة المتجر بصيغة JPG أو JPEG أو PNG أو WEBP وبحد أقصى 5MB."
+      - name: category_id
+        type: text
+        value: "1"
+        description: "مطلوب. معرّف تصنيف نشط."
+      - name: description
+        type: text
+        value: متجر للمنتجات المختارة
+        description: "اختياري. وصف المتجر بحد أقصى 1000 حرف."
+      - name: cover
+        type: file
+        value: []
+        contentType: image/jpeg
+        description: "اختياري. صورة غلاف JPG أو JPEG أو PNG أو WEBP بحد أقصى 10MB."
+      - name: address
+        type: text
+        value: مدينة نصر، القاهرة
+        description: "اختياري. عنوان المتجر بحد أقصى 500 حرف."
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  إنشاء ملف المتجر للحساب الحالي أو تحديث الملف الموجود له.
+
+  لكل حساب متجر سجل واحد فقط؛ تكرار الطلب يحدث السجل نفسه ولا ينشئ متجرًا ثانيًا.
+
+  يحفظ name وimage وaddress في جدول users لأنها بيانات الهوية المشتركة لكل أنواع الحسابات.
+
+  يحفظ category_id وdescription وcover في جدول stores لأنها تفاصيل خاصة بالمتجر.
+
+  ## عنوان الطلب
+
+  POST {{store_url}}/profile
+
+  قيمة store_url الحالية في المجموعة: http://127.0.0.1:8000/api/store
+
+  ## المصادقة
+
+  الطلب محمي ويتطلب Bearer token صالحًا لحساب نوعه store.
+
+  يعيد endpoint التسجيل access_token يمكن وضعه في متغير المجموعة access_token.
+
+  ## Body (multipart-form)
+
+  - name (text): مطلوب. اسم المتجر، من حرفين إلى 255 حرفًا.
+
+  - image (file): مطلوب. صورة المتجر. الصيغ المسموحة JPG وJPEG وPNG وWEBP، بحد أقصى 5MB.
+
+  - category_id (integer): مطلوب. معرّف تصنيف موجود ونشط.
+
+  - description (text): اختياري. وصف المتجر، بحد أقصى 1000 حرف.
+
+  - cover (file): اختياري. صورة الغلاف. الصيغ المسموحة JPG وJPEG وPNG وWEBP، بحد أقصى 10MB.
+
+  - address (text): اختياري. عنوان المتجر، بحد أقصى 500 حرف.
+
+  حذف description أو cover أو address من الطلب يبقي القيمة الحالية دون تغيير عند التحديث.
+
+  لا توجد حقول Enum في هذا الطلب.
+
+  ## الاستجابة الناجحة
+
+  يعيد الخادم HTTP 200 مع id وowner_id وname ومسارات الصور وcategory_id والحقول الاختيارية الحالية.
+
+  ## أخطاء مهمة
+
+  يعيد الخادم HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  يعيد الخادم HTTP 422 عند غياب name أو image أو category_id، أو عند إرسال صورة أو تصنيف غير صالح.
+
+  يعيد الخادم HTTP 422 عندما لا يكون نوع الحساب store.

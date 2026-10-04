@@ -1,0 +1,33 @@
+info:
+  name: get-preferences
+  type: http
+  seq: 5
+
+http:
+  method: GET
+  url: "{{general_url}}/notifications/preferences"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  جلب تفضيلات إشعارات الحساب الحالي، مع إنشاء القيم الافتراضية المفعلة عند أول طلب.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب user أو store.
+
+  ## الاستجابة
+
+  يعيد orders_enabled وpickup_enabled وreturns_enabled وchats_enabled وoffers_enabled كقيم boolean.
+
+  ## الأخطاء
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.

@@ -1,0 +1,99 @@
+info:
+  name: update-account-type
+  type: http
+  seq: 4
+
+http:
+  method: PATCH
+  url: "{{general_url}}/accounts/1/type"
+  headers:
+    - name: Accept-Language
+      value: ar
+  body:
+    type: multipart-form
+    data:
+      - name: account_type
+        type: text
+        value: user
+        description: "مطلوب. نوع الحساب: user للمستخدم أو store للمتجر."
+      - name: country_id
+        type: text
+        value: "1"
+        description: اختياري. معرّف دولة نشطة، ويصبح مطلوبًا عند إرسال المحافظة أو المدينة.
+      - name: governorate_id
+        type: text
+        value: "1"
+        description: اختياري. معرّف محافظة نشطة تتبع الدولة المحددة، ويصبح مطلوبًا عند إرسال المدينة.
+      - name: city_id
+        type: text
+        value: "1"
+        description: اختياري. معرّف مدينة نشطة تتبع المحافظة المحددة.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## الغرض
+
+  تحديث نوع الحساب بعد التسجيل، مع إمكانية تحديث موقعه اختياريًا.
+
+  هذا endpoint عام ولا يتطلب تسجيل الدخول أو Authorization.
+
+  ## عنوان الطلب
+
+  PATCH {{general_url}}/accounts/{account}/type
+
+  قيمة general_url الحالية في المجموعة: http://127.0.0.1:8000/api
+
+  ## Path parameters
+
+  - account (integer): مطلوب. معرّف الحساب الذي أعاده endpoint التسجيل.
+
+  استبدل الرقم 1 في رابط الطلب بمعرّف الحساب الفعلي.
+
+  ## Headers
+
+  - Accept-Language: اختياري. استخدم ar للرسائل العربية أو en للرسائل الإنجليزية.
+
+  ## Body (multipart-form)
+
+  - account_type (text): مطلوب. نوع الحساب الجديد.
+
+  - user: حساب مستخدم شخصي.
+
+  - store: حساب متجر.
+
+  - country_id (integer): اختياري. معرّف دولة نشطة. يصبح مطلوبًا عند إرسال governorate_id أو city_id.
+
+  - governorate_id (integer): اختياري. معرّف محافظة نشطة تتبع country_id. يصبح مطلوبًا عند إرسال city_id.
+
+  - city_id (integer): اختياري. معرّف مدينة نشطة تتبع governorate_id.
+
+  يمكن حذف حقول الموقع الثلاثة من الطلب لتحديث نوع الحساب فقط مع إبقاء الموقع الحالي كما هو.
+
+  تغيير الدولة دون إرسال المحافظة يمسح المحافظة والمدينة القديمتين لمنع حفظ موقع غير متناسق.
+
+  تغيير المحافظة دون إرسال المدينة يمسح المدينة القديمة للسبب نفسه.
+
+  إرسال country_id بقيمة فارغة يمسح الموقع كاملًا.
+
+  ## الاستجابة الناجحة
+
+  يعيد الخادم HTTP 200 مع معرّف الحساب، ونوعه، ومعرّفات الدولة والمحافظة والمدينة الحالية.
+
+  مثال مختصر:
+
+  {"data":{"id":1,"account_type":"user","country_id":1,"governorate_id":1,"city_id":1},"message":"تم تحديث نوع الحساب والموقع بنجاح."}
+
+  ## أخطاء التحقق
+
+  يعيد الخادم HTTP 422 عندما يكون account_type مفقودًا أو خارج القيم user وstore.
+
+  يعيد الخادم HTTP 422 عندما لا توجد الدولة أو المحافظة أو المدينة، أو عندما لا تتبع القيمة موقعها الأب.
+
+  يعيد الخادم HTTP 404 عندما لا يوجد الحساب المحدد في الرابط.

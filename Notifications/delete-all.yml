@@ -1,0 +1,33 @@
+info:
+  name: delete-all
+  type: http
+  seq: 4
+
+http:
+  method: DELETE
+  url: "{{general_url}}/notifications"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  حذف كل إشعارات الحساب الحالي فقط.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب user أو store.
+
+  ## الاستجابة
+
+  يعيد deleted بعدد الإشعارات المحذوفة.
+
+  ## الأخطاء
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.

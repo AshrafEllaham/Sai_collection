@@ -1,0 +1,41 @@
+info:
+  name: list
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{general_url}}/notifications?unread_only=false&per_page=15"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  جلب إشعارات الحساب الحالي، سواء كان نوعه user أو store.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا. الإشعارات خاصة بالحساب الحالي ولا يمكن جلب إشعارات حساب آخر.
+
+  ## Query Parameters
+
+  - unread_only (boolean): اختياري. عند true يعيد الإشعارات غير المقروءة فقط.
+
+  - per_page (integer): اختياري. من 1 إلى 100، والقيمة الافتراضية 15.
+
+  ## الاستجابة
+
+  يعيد قائمة paginated تحتوي id وtype وtitle وmessage وaction_url وis_read والتواريخ.
+
+  ## الأخطاء
+
+  HTTP 401 عند غياب التوكن.
+
+  HTTP 422 عند إرسال query parameters غير صالحة.

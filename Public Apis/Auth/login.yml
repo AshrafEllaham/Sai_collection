@@ -1,0 +1,81 @@
+info:
+  name: login
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{general_url}}/login"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  body:
+    type: multipart-form
+    data:
+      - name: email
+        type: text
+        value: existing.user@example.com
+        description: اختياري عند استخدام رقم الهاتف. أرسل البريد أو بيانات الهاتف فقط.
+      - name: phone_code
+        type: text
+        value: ""
+        description: مطلوب مع phone عند تسجيل الدخول بالهاتف، وممنوع مع email.
+      - name: phone
+        type: text
+        value: ""
+        description: رقم الهاتف من 6 إلى 20 رقمًا دون كود الدولة.
+      - name: password
+        type: text
+        value: StrongPass123
+        description: كلمة مرور الحساب.
+  auth:
+    type: none
+
+runtime:
+  actions:
+    - type: set-variable
+      phase: after-response
+      selector:
+        expression: res.body.data.access_token
+        method: jsonq
+      variable:
+        name: access_token
+        scope: runtime
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## الغرض
+  تسجيل الدخول إلى حساب موجود بالبريد الإلكتروني أو رقم الهاتف وكلمة المرور.
+  الطلب عام ولا يتطلب Authorization.
+
+  ## عنوان الطلب
+  POST {{general_url}}/login
+  قيمة general_url الحالية في المجموعة: http://127.0.0.1:8000/api
+
+  ## Body (multipart-form)
+  أرسل email أو الزوج phone_code وphone، وليس الخيارات معًا.
+
+  - email (text، اختياري): بريد الحساب المسجل. عند استخدامه لا ترسل phone_code أو phone.
+  - phone_code (text، مطلوب مع phone): كود دولي يبدأ بـ +، مثل +20.
+  - phone (text، مطلوب مع phone_code): رقم الهاتف من 6 إلى 20 رقمًا، دون كود الدولة.
+  - password (text، مطلوب): كلمة مرور الحساب، حتى 255 حرفًا.
+
+  ## المصادقة
+  لا يتطلب الطلب رمز دخول سابقًا.
+  حد المحاولات 5 طلبات في الدقيقة.
+
+  ## النتيجة
+  عند النجاح يعيد بيانات المستخدم وaccess_token من نوع bearer.
+  تحفظ المجموعة الرمز تلقائيًا في runtime variable باسم access_token.
+  الحساب الموقوف أو بيانات الدخول غير الصحيحة تعيد HTTP 422 برسالة موحدة.
+
+  عند خطأ الحقول يعيد الخادم HTTP 422 مع message وerrors مترجمة.
+  أرسل email أو phone_code مع phone؛ إرسال البريد والهاتف معًا مرفوض.
