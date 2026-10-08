@@ -4,16 +4,12 @@ info:
   seq: 6
 
 http:
-  method: PUT
+  method: PATCH
   url: "{{general_url}}/notifications/preferences"
   body:
     type: json
     data: |-
       {
-        "orders_enabled": true,
-        "pickup_enabled": true,
-        "returns_enabled": true,
-        "chats_enabled": true,
         "offers_enabled": false
       }
   auth: inherit
@@ -28,7 +24,7 @@ settings:
 docs: |-
   ## الغرض
 
-  تحديث تفضيلات إشعارات الحساب الحالي.
+  تحديث تفضيل واحد أو أكثر لإشعارات الحساب الحالي دون تغيير التفضيلات التي لم تُرسل.
 
   ## المصادقة
 
@@ -36,24 +32,32 @@ docs: |-
 
   ## Body (JSON)
 
-  - orders_enabled (boolean): مطلوب. إشعارات الطلبات.
+  - orders_enabled (boolean): اختياري. true للتفعيل أو false للإيقاف.
 
-  - pickup_enabled (boolean): مطلوب. إشعارات الاستلام.
+  - pickup_enabled (boolean): اختياري. true للتفعيل أو false للإيقاف.
 
-  - returns_enabled (boolean): مطلوب. إشعارات الاسترجاع.
+  - returns_enabled (boolean): اختياري. true للتفعيل أو false للإيقاف.
 
-  - chats_enabled (boolean): مطلوب. إشعارات المحادثات.
+  - chats_enabled (boolean): اختياري. true للتفعيل أو false للإيقاف.
 
-  - offers_enabled (boolean): مطلوب. إشعارات العروض.
+  - offers_enabled (boolean): اختياري. true للتفعيل أو false للإيقاف.
+
+  أرسل حقلًا واحدًا أو أكثر، ويجب إرسال قيمة واحدة على الأقل.
 
   لا توجد حقول Enum في هذا الطلب.
 
-  ## الاستجابة
+  ## مثال
 
-  يعيد التفضيلات المحفوظة.
+  يرسل المثال أعلاه offers_enabled=false لإيقاف إشعارات العروض فقط.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 ويعيد جميع التفضيلات بعد حفظ التغيير.
+
+  مثال مختصر: {"data":{"orders_enabled":true,"pickup_enabled":true,"returns_enabled":true,"chats_enabled":true,"offers_enabled":false}}
 
   ## الأخطاء
 
   HTTP 401 عند غياب التوكن.
 
-  HTTP 422 عند غياب أي حقل أو إرسال قيمة ليست boolean.
+  HTTP 422 عند إرسال قيمة ليست boolean أو عدم إرسال أي حقل معروف.

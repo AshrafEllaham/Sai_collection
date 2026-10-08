@@ -1,0 +1,43 @@
+info:
+  name: تسجيل الخروج
+  type: http
+  seq: 8
+
+http:
+  method: POST
+  url: "{{general_url}}/logout"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  إنهاء جلسة الحساب الحالية وإبطال Bearer token المستخدم في هذا الطلب.
+
+  ## عنوان الطلب
+
+  POST {{general_url}}/logout
+
+  قيمة general_url الحالية في المجموعة: http://127.0.0.1:8000/api
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا، ويرثه من إعدادات المجموعة.
+
+  ## Body
+
+  لا يحتاج هذا الطلب إلى body أو query parameters.
+
+  ## الاستجابة الناجحة
+
+  يعيد HTTP 200 ورسالة تأكيد تسجيل الخروج. يصبح التوكن الحالي غير صالح بعد نجاح الطلب.
+
+  ## الأخطاء
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.

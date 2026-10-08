@@ -1,0 +1,45 @@
+info:
+  name: حذف الحساب
+  type: http
+  seq: 9
+
+http:
+  method: DELETE
+  url: "{{general_url}}/account"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  حذف الحساب الحالي مباشرة باستخدام Soft Delete، ثم إبطال التوكن الحالي.
+
+  ## عنوان الطلب
+
+  DELETE {{general_url}}/account
+
+  قيمة general_url الحالية في المجموعة: http://127.0.0.1:8000/api
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا، ويرثه من إعدادات المجموعة.
+
+  ## Body
+
+  لا يرسل هذا الطلب Body.
+
+  ## الاستجابة الناجحة
+
+  يعيد HTTP 200 مع data=null ورسالة نجاح.
+
+  بعد نجاح الطلب يُحفظ deleted_at للمستخدم ويصبح التوكن الحالي غير صالح.
+
+  ## الأخطاء
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
