@@ -1,0 +1,65 @@
+info:
+  name: إعدادات التطبيق
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{general_url}}/settings"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## الغرض
+
+  جلب بيانات الموقع والتواصل وروابط صفحات المحتوى باللغة المختارة.
+
+  ## عنوان الطلب
+
+  GET {{general_url}}/settings
+
+  قيمة general_url الحالية في المجموعة: http://127.0.0.1:8000/api
+
+  ## المصادقة
+
+  هذا endpoint عام ولا يتطلب تسجيل الدخول. الطلب لا يمرر مصادقة موروثة.
+
+  ## Headers
+
+  - Accept (مطلوب): application/json.
+  - Accept-Language (اختياري): ar أو en لاختيار لغة about_app وprivacy وterms_conditions ورسالة الرد. الافتراضي هو اللغة المفضلة للعميل، ثم لغة التطبيق الافتراضية.
+
+  ## بيانات الاستجابة
+
+  - whatsapp (string|null): رقم واتساب أو رابط التواصل.
+  - phone (string|null): رقم الهاتف.
+  - other_phone (string|null): رقم هاتف إضافي.
+  - email (string|null): البريد الإلكتروني.
+  - facebook (string|null): رابط صفحة فيسبوك.
+  - instagram (string|null): رابط صفحة إنستغرام.
+  - website_name (string|null): اسم الموقع باللغة المختارة.
+  - about_app (string|null): رابط صفحة نبذة التطبيق باللغة المختارة.
+  - privacy (string|null): رابط صفحة سياسة الخصوصية باللغة المختارة.
+  - terms_conditions (string|null): رابط صفحة الشروط والأحكام باللغة المختارة.
+
+  ## الاستجابة الناجحة
+
+  يعيد HTTP 200 مع كائن الإعدادات داخل data. إذا لم تُحفظ إعدادات بعد، تكون data بقيمة null.
+
+  مثال:
+
+  {"code":200,"data":{"whatsapp":"+201012345678","phone":"+201012345678","other_phone":"+201055555555","email":"support@example.com","facebook":"https://facebook.com/saey","instagram":"https://instagram.com/saey","website_name":"سعي","about_app":"http://127.0.0.1:8000/ar/about-app","privacy":"http://127.0.0.1:8000/ar/privacy","terms_conditions":"http://127.0.0.1:8000/ar/terms-conditions"},"message":"تم جلب إعدادات التطبيق بنجاح."}
+
+  ## أخطاء التحقق
+
+  لا يحتوي الطلب على query parameters أو body، لذلك لا توجد أخطاء تحقق خاصة به.
