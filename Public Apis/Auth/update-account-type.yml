@@ -1,5 +1,5 @@
 info:
-  name: update-account-type
+  name: "تحديث نوع الحساب"
   type: http
   seq: 4
 

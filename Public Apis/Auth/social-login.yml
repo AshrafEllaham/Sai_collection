@@ -1,5 +1,5 @@
 info:
-  name: social-login
+  name: "تسجيل الدخول الاجتماعي"
   type: http
   seq: 6
 

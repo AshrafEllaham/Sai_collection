@@ -1,5 +1,5 @@
 info:
-  name: update-profile
+  name: "تحديث ملف المتجر"
   type: http
   seq: 1
 

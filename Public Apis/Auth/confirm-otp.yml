@@ -1,5 +1,5 @@
 info:
-  name: confirm-otp
+  name: "تأكيد رمز التحقق"
   type: http
   seq: 2
 

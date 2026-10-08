@@ -1,5 +1,5 @@
 info:
-  name: login
+  name: "تسجيل الدخول"
   type: http
   seq: 5
 
@@ -30,8 +30,6 @@ http:
         type: text
         value: StrongPass123
         description: كلمة مرور الحساب.
-  auth:
-    type: none
 
 runtime:
   actions:

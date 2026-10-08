@@ -1,5 +1,5 @@
 info:
-  name: register
+  name: "إنشاء حساب"
   type: http
   seq: 3
 

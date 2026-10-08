@@ -1,5 +1,5 @@
 info:
-  name: mark-all-as-read
+  name: "تعليم كل الإشعارات كمقروءة"
   type: http
   seq: 3
 

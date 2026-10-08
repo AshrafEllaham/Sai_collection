@@ -1,5 +1,5 @@
 info:
-  name: get-preferences
+  name: "عرض تفضيلات الإشعارات"
   type: http
   seq: 5
 

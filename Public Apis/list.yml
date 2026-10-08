@@ -1,0 +1,67 @@
+info:
+  name: قائمة البانرات
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{general_url}}/banners"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  params:
+    - name: type
+      value: user
+      type: query
+      description: "اختياري. نوع البانر: user للمستخدم أو store للمتجر. احذف المعامل لإرجاع كل البانرات."
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## الغرض
+
+  جلب البانرات المتاحة، مع إمكانية تصفية النتائج حسب نوع الحساب المستهدف.
+
+  ## عنوان الطلب
+
+  GET {{general_url}}/banners
+
+  قيمة general_url الحالية في المجموعة: http://127.0.0.1:8000/api
+
+  ## المصادقة
+
+  هذا endpoint عام ولا يتطلب تسجيل الدخول. لا يحتوي هذا الطلب على إعداد مصادقة موروث.
+
+  ## Query parameters
+
+  - type (string، اختياري): نوع الحساب المستهدف. احذف هذا المعامل لإرجاع كل البانرات.
+  - user: بانرات المستخدم.
+  - store: بانرات المتجر.
+
+  القيم مأخوذة من AccountTypeEnum في التطبيق.
+
+  ## Headers
+
+  - Accept (مطلوب): application/json.
+  - Accept-Language (اختياري): ar للرسائل العربية أو en للرسائل الإنجليزية.
+
+  ## الاستجابة الناجحة
+
+  يعيد HTTP 200 مع مصفوفة data. يحتوي كل عنصر على id ورابط الصورة image ونوع الحساب type.
+
+  مثال:
+
+  {"code":200,"data":[{"id":1,"image":"http://127.0.0.1:8000/storage/banners/banner.jpg","type":"user"}],"message":"تم جلب البانرات بنجاح."}
+
+  عندما لا توجد بانرات مطابقة، تكون data مصفوفة فارغة.
+
+  ## أخطاء التحقق
+
+  يعيد HTTP 422 إذا كانت type ليست نصًا أو كانت خارج القيم user وstore، مع رسالة مترجمة.

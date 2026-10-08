@@ -1,5 +1,5 @@
 info:
-  name: send-otp
+  name: "إرسال رمز التحقق"
   type: http
   seq: 1
 

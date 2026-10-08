@@ -1,0 +1,77 @@
+info:
+  name: قائمة الأسئلة الشائعة
+  type: http
+  seq: 3
+
+http:
+  method: GET
+  url: "{{general_url}}/faqs"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  params:
+    - name: type
+      value: user
+      type: query
+      description: "اختياري. نوع الحساب: user لأسئلة المستخدم أو store لأسئلة المتجر. احذف المعامل لإرجاع جميع الأسئلة."
+    - name: pagination
+      value: "off"
+      type: query
+      description: "اختياري. أرسل on لتفعيل pagination؛ الوضع الافتراضي off."
+    - name: limit_per_page
+      value: "10"
+      type: query
+      description: "اختياري. عدد النتائج في الصفحة عند pagination=on؛ الافتراضي 10."
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+docs: |-
+  ## الغرض
+
+  جلب الأسئلة الشائعة وإجاباتها باللغة المحددة في Accept-Language، مع إمكانية التصفية حسب نوع الحساب.
+
+  ## عنوان الطلب
+
+  GET {{general_url}}/faqs
+
+  قيمة general_url الحالية في المجموعة: http://127.0.0.1:8000/api
+
+  ## المصادقة
+
+  هذا endpoint عام ولا يتطلب تسجيل الدخول. الطلب لا يمرر مصادقة موروثة.
+
+  ## Query parameters
+
+  - type (string، اختياري): نوع الحساب المطلوب. احذف المعامل لإرجاع أسئلة المستخدم والمتجر.
+  - user: أسئلة المستخدم.
+  - store: أسئلة المتجر.
+  القيم مأخوذة من AccountTypeEnum في التطبيق.
+  - pagination (اختياري): استخدم on لتفعيل pagination. الوضع الافتراضي off.
+  - limit_per_page (اختياري): عدد النتائج في الصفحة عند تفعيل pagination. القيمة الافتراضية 10.
+
+  ## Headers
+
+  - Accept (مطلوب): application/json.
+  - Accept-Language (اختياري): ar أو en لتحديد لغة السؤال والإجابة ورسائل الرد.
+
+  ## الاستجابة الناجحة
+
+  يعيد HTTP 200 مع مصفوفة data. يحتوي كل عنصر على id وtype وquestion وanswer باللغة المطلوبة.
+  عند pagination=on، يعيد أيضًا بيانات الصفحات مثل current_page وlast_page وtotal.
+
+  مثال:
+
+  {"code":200,"data":[{"id":1,"type":"user","question":"كيف أشتري منتجًا؟","answer":"افتح تفاصيل المنتج واتبع خطوات تأكيد الطلب."}],"message":"تم جلب الأسئلة الشائعة بنجاح."}
+
+  عندما لا توجد أسئلة مطابقة، تكون data مصفوفة فارغة.
+
+  ## أخطاء التحقق
+
+  يعيد HTTP 422 إذا كانت type ليست نصًا أو كانت خارج القيم user وstore، مع رسالة مترجمة.

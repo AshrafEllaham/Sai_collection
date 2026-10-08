@@ -1,5 +1,5 @@
 info:
-  name: delete-all
+  name: "حذف كل الإشعارات"
   type: http
   seq: 4
 
