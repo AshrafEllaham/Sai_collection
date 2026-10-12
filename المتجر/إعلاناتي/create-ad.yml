@@ -1,0 +1,152 @@
+info:
+  name: إنشاء إعلان
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{store_url}}/ads"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  body:
+    type: multipart-form
+    data:
+      - name: ad_package_id
+        type: text
+        value: "1"
+        description: مطلوب. معرّف باقة إعلانية نشطة.
+      - name: submission_action
+        type: text
+        value: submit_for_review
+        description: مطلوب. save_as_draft لحفظ الإعلان كمسودة، أو submit_for_review لخصم التكلفة وإرساله للمراجعة مباشرة.
+      - name: idempotency_key
+        type: text
+        value: 7e2d5a40-7f73-4e95-9809-8c935c22f842
+        description: مطلوب عند submission_action=submit_for_review. استخدم UUID جديدًا لكل إعلان، واحتفظ به كما هو عند إعادة محاولة الطلب.
+      - name: payment_method
+        type: text
+        value: online
+        description: مطلوب عند submission_action=submit_for_review. wallet للدفع من رصيد المتجر أو online للدفع الإلكتروني.
+      - name: title
+        type: text
+        value: عرض الصيف
+        description: مطلوب. من حرفين إلى 120 حرفًا.
+      - name: placement
+        type: text
+        value: home
+        description: مطلوب. home أو category أو storefront.
+      - name: action
+        type: text
+        value: view_product
+        description: مطلوب. إحدى قيم AdActionEnum الموضحة في docs.
+      - name: media_type
+        type: text
+        value: image
+        description: مطلوب. image أو video أو file؛ يجب أن يتوافق مع الملف.
+      - name: media
+        type: file
+        value:
+          - /home/nami/Pictures/Screenshots/Screenshot from 2026-09-30 20-44-14.png
+        contentType: image/png
+        description: مطلوب. JPG أو JPEG أو PNG أو WEBP أو MP4، حتى 20MB.
+      - name: action_label
+        type: text
+        value: تسوق الآن
+        description: اختياري. حتى 60 حرفًا.
+      - name: caption
+        type: text
+        value: خصومات محدودة لفترة قصيرة
+        description: اختياري. حتى 2000 حرف.
+      - name: product_id
+        type: text
+        value: "1"
+        description: اختياري. معرّف منتج موجود.
+        disabled: true
+      - name: category_id
+        type: text
+        value: "1"
+        description: اختياري. معرّف قسم نشط.
+      - name: starts_at
+        type: text
+        value: 2026-11-01T10:00:00+02:00
+        description: اختياري. تاريخ مستقبلي بصيغة تاريخ ووقت.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  ينشئ إعلانًا جديدًا بإحدى طريقتين في الطلب نفسه: حفظه كمسودة، أو اختيار طريقة الدفع لإرساله للمراجعة.
+
+  موضع واجهة المتجر مجاني. موضعا home وcategory يستخدمان الأسعار المحددة في إعدادات التطبيق، وتستخدم تكلفة الباقة فقط إذا لم تُضبط أسعار المواضع بعد. تُقرأ التكلفة والعملة من الخادم ولا يقبل العميل قيمتهما.
+
+  ## عنوان الطلب
+
+  POST {{store_url}}/ads
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب من نوع store، ويرثه من إعدادات المجموعة.
+
+  ## Headers
+
+  Accept: مطلوب. application/json.
+
+  Accept-Language: اختياري. ar أو en للغة رسائل التحقق والرد.
+
+  ## Body (multipart-form)
+
+  ad_package_id: مطلوب. معرّف باقة نشطة. السعر والعملة يؤخذان من بيانات الباقة.
+
+  title: مطلوب. عنوان الإعلان من حرفين إلى 120 حرفًا.
+
+  placement: مطلوب. موضع الإعلان: home للصفحة الرئيسية، category لصفحة القسم، storefront لواجهة المتجر.
+
+  action: مطلوب. view_product لفتح المنتج، view_store لفتح المتجر، start_chat لبدء محادثة، buy_now لبدء الشراء.
+
+  media_type: مطلوب. image أو video أو file. يجب اختيار نوع يناسب الملف.
+
+  media: مطلوب. ملف JPG أو JPEG أو PNG أو WEBP أو MP4، بحد أقصى 20MB.
+
+  submission_action: مطلوب. save_as_draft يحفظ الإعلان كمسودة دون خصم. submit_for_review يخصم تكلفة الإعلان ويرسله للمراجعة ضمن عملية الإنشاء نفسها.
+
+  idempotency_key: مطلوب فقط مع submit_for_review. استخدم UUID جديدًا لكل إعلان، وأعد استخدام القيمة نفسها عند إعادة محاولة الطلب. قيمة هذا الملف نموذجية؛ غيّرها عند إنشاء إعلان جديد.
+
+  payment_method: مطلوب فقط مع submit_for_review. wallet يخصم المبلغ من المحفظة النشطة بعد التحقق من كفاية الرصيد وتطابق العملة. online ينشئ دفعة معلقة ويعيد روابط صفحة الدفع والنجاح والفشل؛ يبقى الإعلان مسودة حتى تأكيد الدفع من تكامل الدفع.
+
+  القيم المسموحة لطريقة الدفع: wallet للدفع من المحفظة، وonline للدفع الإلكتروني.
+
+  لتجربة الحفظ كمسودة، غيّر submission_action إلى save_as_draft واحذف idempotency_key وpayment_method من body.
+
+  action_label: اختياري. نص زر الإجراء حتى 60 حرفًا.
+
+  caption: اختياري. وصف حتى 2000 حرف.
+
+  product_id: اختياري. معرّف منتج موجود.
+
+  category_id: اختياري. معرّف قسم نشط.
+
+  starts_at: اختياري. تاريخ ووقت مستقبلي لبدء الإعلان.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع الإعلان المنشأ. تكون الحالة draft مع save_as_draft، أو pending_review بعد دفع wallet بنجاح. عند اختيار online تبقى الحالة draft وتُعاد الروابط redirectUrl وpaymentSuccess وpaymentaFiled.
+
+  مثال إرسال للمراجعة بالمحفظة: {"code":200,"data":{"id":1,"status":"pending_review","cost":"350.00","currency":"EGP"}}
+
+  مثال online: {"code":200,"data":{"id":1,"status":"draft","redirectUrl":"https://example.test/pay-online/14/pay_trip","paymentSuccess":"https://example.test/payment-success/14/pay_trip","paymentaFiled":"https://example.test/payment-failed/14/pay_trip"}}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 422 عند نقص حقل مطلوب أو اختيار باقة غير نشطة أو قيمة Enum غير صالحة أو ملف غير مدعوم أو أكبر من الحد أو عدم كفاية رصيد المحفظة عند wallet أو إذا لم يكن الحساب متجرًا.

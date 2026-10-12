@@ -1,0 +1,53 @@
+info:
+  name: تبديل إخفاء ونشر منتج
+  type: http
+  seq: 3
+
+http:
+  method: PATCH
+  url: "{{store_url}}/products/1/hide"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  تبديل ظهور منتج المتجر. إذا كانت حالته hidden ينشره endpoint، وفي الحالات الأخرى يغيّر حالته إلى hidden.
+
+  تكرار الطلب يبدّل بين hidden وpublished.
+
+  ## عنوان الطلب
+
+  PATCH {{store_url}}/products/{{product_id}}/hide
+
+  ## Path parameter
+
+  product_id: مطلوب. المعرّف الرقمي للمنتج المملوك للحساب الحالي.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب نوعه store.
+
+  ## Body
+
+  لا يتطلب هذا الطلب body.
+
+  ## الاستجابة الناجحة
+
+  يعيد HTTP 200 وبيانات المنتج بعد تغيير الحالة.
+
+  data.status تكون hidden بعد إخفاء المنتج أو published بعد نشره.
+
+  message تكون «تم تحديث ظهور المنتج بنجاح.» أو ترجمتها الإنجليزية.
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 404 إذا لم يوجد المنتج أو لم يكن مملوكًا للحساب الحالي.

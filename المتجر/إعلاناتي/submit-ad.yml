@@ -1,0 +1,82 @@
+info:
+  name: إرسال مسودة محفوظة للمراجعة
+  type: http
+  seq: 9
+
+http:
+  method: POST
+  url: "{{store_url}}/ads/1/submit"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "payment_method": "wallet"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يبدأ إرسال إعلان محفوظ مسبقًا كمسودة إلى مراجعة سعي باستخدام طريقة الدفع المختارة.
+
+  عند إنشاء إعلان جديد، استخدم طلب «إنشاء إعلان» واختر submission_action=submit_for_review لإتمام الإنشاء والدفع والإرسال في طلب واحد.
+
+  wallet يخصم التكلفة بعد التحقق من الرصيد والعملة. online ينشئ دفعة معلقة ويعيد روابط الدفع فقط. عند النجاح ينتقل الإعلان إلى pending_review، وعند الفشل يُحذف الإعلان المحفوظ كمسودة.
+
+  الإعلان المجاني في موضع واجهة المتجر يرسل للمراجعة دون خصم أو إنشاء حركة مالية.
+
+  ## عنوان الطلب
+
+  POST {{store_url}}/ads/{ad}/submit
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب من نوع store، ويرثه من إعدادات المجموعة.
+
+  ## Path parameters
+
+  ad: مطلوب. المعرّف الرقمي لإعلان محفوظ كمسودة ومملوك للمتجر الحالي.
+
+  ## Headers
+
+  Accept: مطلوب. application/json.
+
+  Accept-Language: اختياري. ar أو en للغة الرسائل.
+
+  ## Body
+
+  payment_method (string، مطلوب): wallet للدفع من رصيد المحفظة، أو online للدفع الإلكتروني. التكلفة والعملة يحددهما الخادم من بيانات الإعلان والباقة، ولا يقبل قيمة الدفع من العميل.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع الإعلان بحالة pending_review بعد دفع wallet بنجاح.
+
+  عند اختيار online تكون data مكوّنة من redirectUrl وpaymentSuccess وpaymentaFiled فقط، دون بيانات الإعلان.
+
+  مثال wallet: {"code":200,"data":{"id":1,"status":"pending_review","cost":"350.00","currency":"EGP"}}
+
+  مثال online: {"code":200,"data":{"redirectUrl":"https://example.test/pay-online/14/pay_trip","paymentSuccess":"https://example.test/payment-success/14/pay_trip","paymentaFiled":"https://example.test/payment-failed/14/pay_trip"}}
+
+  تكرار الطلب بعد نجاحه لا يخصم المبلغ مرة أخرى.
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 404 إذا لم يكن الإعلان موجودًا أو لا يخص المتجر الحالي.
+
+  HTTP 422 عند عدم كفاية رصيد المحفظة أو عدم تطابق العملة مع wallet، أو استخدام طريقة دفع غير متاحة للإعلان، أو إذا لم يكن الإعلان مسودة.

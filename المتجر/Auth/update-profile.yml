@@ -1,5 +1,5 @@
 info:
-  name: "تحديث ملف المتجر"
+  name: تحديث ملف المتجر
   type: http
   seq: 1
 
@@ -12,29 +12,31 @@ http:
       - name: name
         type: text
         value: متجر سعي
-        description: "مطلوب. اسم المتجر من حرفين إلى 255 حرفًا."
+        description: مطلوب. اسم المتجر من حرفين إلى 255 حرفًا.
       - name: image
         type: file
-        value: []
-        contentType: image/jpeg
-        description: "مطلوب. صورة المتجر بصيغة JPG أو JPEG أو PNG أو WEBP وبحد أقصى 5MB."
+        value:
+          - /home/nami/Pictures/Screenshots/Screenshot from 2026-09-30 20-44-14.png
+        contentType: image/png
+        description: مطلوب. صورة المتجر بصيغة JPG أو JPEG أو PNG أو WEBP وبحد أقصى 5MB.
       - name: category_id
         type: text
         value: "1"
-        description: "مطلوب. معرّف تصنيف نشط."
+        description: مطلوب. معرّف تصنيف نشط.
       - name: description
         type: text
         value: متجر للمنتجات المختارة
-        description: "اختياري. وصف المتجر بحد أقصى 1000 حرف."
+        description: اختياري. وصف المتجر بحد أقصى 1000 حرف.
       - name: cover
         type: file
-        value: []
-        contentType: image/jpeg
-        description: "اختياري. صورة غلاف JPG أو JPEG أو PNG أو WEBP بحد أقصى 10MB."
+        value:
+          - /home/nami/Pictures/Screenshots/Screenshot from 2026-10-09 14-45-54.png
+        contentType: image/png
+        description: اختياري. صورة غلاف JPG أو JPEG أو PNG أو WEBP بحد أقصى 10MB.
       - name: address
         type: text
         value: مدينة نصر، القاهرة
-        description: "اختياري. عنوان المتجر بحد أقصى 500 حرف."
+        description: اختياري. عنوان المتجر بحد أقصى 500 حرف.
   auth: inherit
 
 settings:

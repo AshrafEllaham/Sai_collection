@@ -1,0 +1,121 @@
+info:
+  name: تحديث منتج
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{store_url}}/products/1"
+  body:
+    type: multipart-form
+    data:
+      - name: _method
+        type: text
+        value: put
+        description: مطلوب لتوجيه طلب multipart إلى مسار PATCH مع دعم رفع الملفات في PHP.
+      - name: name
+        type: text
+        value: جاكيت جلد طبيعي محدث
+        description: اختياري. عند إرساله يجب أن يكون من حرفين إلى 255 حرفًا.
+      - name: category_id
+        type: text
+        value: "1"
+        description: اختياري. عند إرساله يجب أن يكون معرّف قسم نشط.
+      - name: description
+        type: text
+        value: وصف محدث للمنتج
+        description: اختياري. عند إرساله يجب ألا يتجاوز 300 حرف.
+      - name: features[]
+        type: text
+        value: خامة محدثة
+        description: اختياري ومتكرر. عند الإرسال يستبدل قائمة المميزات الحالية. حتى 8 ميزات، 80 حرفًا لكل واحدة.
+      - name: price
+        type: text
+        value: "1900"
+        description: اختياري. عند إرساله يجب أن يكون رقمًا أكبر من صفر.
+      - name: stock_quantity
+        type: text
+        value: "12"
+        description: اختياري. عند إرساله يجب أن يكون عددًا صحيحًا لا يقل عن صفر.
+      - name: discount_percentage
+        type: text
+        value: "10"
+        description: اختياري. من 1 إلى 90. أرسل discount_ends_at معه. اترك الحقل خارج الطلب لإبقاء الخصم الحالي.
+      - name: discount_ends_at
+        type: text
+        value: 2027-01-31T23:59:00
+        description: مطلوب عند إرسال discount_percentage. يجب أن يكون في المستقبل.
+      - name: images[]
+        type: file
+        value: []
+        contentType: image/jpeg
+        description: اختياري ومتكرر. يضيف صورًا إلى المعرض الحالي حتى إجمالي 6 صور. JPG أو JPEG أو PNG أو WEBP، حتى 5MB للصورة.
+      - name: publish
+        type: text
+        value: "1"
+        description: اختياري. 1 للنشر أو إعادة الإظهار، 0 للحفظ كمسودة. عند عدم الإرسال تبقى الحالة الحالية.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  تحديث بيانات منتج مملوك لحساب المتجر الحالي.
+
+  ## عنوان الطلب
+
+  المسار: PATCH {{store_url}}/products/{{product_id}}
+
+  يستخدم Bruno POST مع الحقل _method=PATCH حتى يرسل multipart والملفات بالطريقة التي يقرأها PHP.
+
+  ## Path parameter
+
+  product_id: مطلوب. المعرّف الرقمي للمنتج المملوك للحساب الحالي.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب نوعه store.
+
+  ## Body (multipart-form)
+
+  _method: مطلوب في هذا الطلب. القيمة الثابتة PATCH لتفعيل method spoofing.
+
+  name: اختياري. اسم المنتج، من حرفين إلى 255 حرفًا عند إرساله.
+
+  category_id: اختياري. معرّف قسم نشط عند إرساله.
+
+  description: اختياري. وصف المنتج حتى 300 حرف عند إرساله.
+
+  features[]: اختياري ومتكرر. عند إرساله يستبدل المميزات الحالية. حتى 8 ميزات وبحد 80 حرفًا لكل ميزة.
+
+  price: اختياري. رقم أكبر من صفر عند إرساله.
+
+  stock_quantity: اختياري. عدد صحيح لا يقل عن صفر عند إرساله.
+
+  discount_percentage: اختياري. نسبة من 1 إلى 90. عند الإرسال أرسل معها discount_ends_at. عدم إرسالها يبقي الخصم الحالي.
+
+  discount_ends_at: مطلوب مع discount_percentage، ويجب أن يكون تاريخًا مستقبليًا.
+
+  images[]: اختياري ومتكرر. يضيف صورًا إلى المعرض الحالي. الحد الأقصى 6 صور إجمالًا؛ JPG أو JPEG أو PNG أو WEBP، حتى 5MB للصورة.
+
+  publish: اختياري. 1 للنشر أو إعادة إظهار المنتج، 0 لحفظه كمسودة. عند عدم الإرسال تبقى الحالة الحالية.
+
+  لا يحتوي الطلب على حقول Enum.
+
+  ## الاستجابة الناجحة
+
+  يعيد HTTP 200 وبيانات المنتج بعد التحديث.
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 404 إذا لم يوجد المنتج أو لم يكن مملوكًا للحساب الحالي.
+
+  HTTP 422 عند بيانات غير صالحة، أو تجاوز إجمالي 6 صور.

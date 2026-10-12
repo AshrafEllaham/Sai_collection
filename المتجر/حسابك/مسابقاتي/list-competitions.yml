@@ -1,0 +1,75 @@
+info:
+  name: عرض مسابقات المتجر
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{store_url}}/competitions?pagination=on&limit_per_page=10"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  params:
+    - name: pagination
+      value: on
+      type: query
+    - name: limit_per_page
+      value: "10"
+      type: query
+    - name: status
+      value: active
+      type: query
+      disabled: true
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يعرض مسابقات المتجر الحالي مع ملخص ثابت لا يتأثر بفلتر الحالة.
+
+  ## عنوان الطلب
+
+  GET {{store_url}}/competitions
+
+  ## المصادقة
+
+  يتطلب Bearer token لحساب متجر، ويرثه من إعدادات المجموعة.
+
+  ## Query parameters
+
+  pagination: اختياري. on لتفعيل الترقيم، أو off لعرض كل النتائج. الافتراضي on.
+
+  limit_per_page: اختياري. عدد العناصر في الصفحة من 1 إلى 100.
+
+  page: اختياري. رقم الصفحة ويبدأ من 1.
+
+  status: اختياري. إحدى قيم CompetitionStatusEnum: active (نشطة)، ended (انتهت)، drawn (تم السحب)، cancelled (ملغاة).
+
+  ## Headers
+
+  Accept: مطلوب. application/json.
+
+  Accept-Language: اختياري. ar أو en لرسائل الرد.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع عناصر المسابقات وsummary.active_count وsummary.total_participation_count وsummary.drawn_count.
+
+  مثال مختصر: {"code":200,"summary":{"active_count":2,"total_participation_count":18,"drawn_count":1},"data":[{"id":1,"title":"مسابقة الصيف","status":"active","entries_count":8}]}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 422 عند حالة غير معروفة أو قيمة ترقيم غير صالحة.
+
+  HTTP 422 إذا لم يكن الحساب من نوع متجر.

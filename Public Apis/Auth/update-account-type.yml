@@ -14,7 +14,7 @@ http:
     data:
       - name: account_type
         type: text
-        value: user
+        value: store
         description: "مطلوب. نوع الحساب: user للمستخدم أو store للمتجر."
       - name: country_id
         type: text

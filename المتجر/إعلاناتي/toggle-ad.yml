@@ -1,0 +1,48 @@
+info:
+  name: إيقاف أو إعادة تفعيل إعلان
+  type: http
+  seq: 4
+
+http:
+  method: PATCH
+  url: "{{store_url}}/ads/1/toggle"
+  headers:
+    - name: Accept
+      value: application/json
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يبدل حالة الإعلان النشط إلى paused، أو يعيد الإعلان الموقوف إلى active أو scheduled إذا كان موعده مستقبلًا.
+
+  ## عنوان الطلب
+
+  PATCH {{store_url}}/ads/{ad}/toggle
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب من نوع store، ويرثه من إعدادات المجموعة.
+
+  ## Path parameters
+
+  ad: مطلوب. المعرّف الرقمي للإعلان المملوك للمتجر الحالي.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع الإعلان وحالته الجديدة: paused أو active أو scheduled.
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 404 عندما لا يكون الإعلان موجودًا أو لا يخص المتجر الحالي.
+
+  HTTP 422 إذا كانت حالة الإعلان ليست active أو paused.

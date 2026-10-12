@@ -1,0 +1,60 @@
+info:
+  name: تفاصيل الإعلان
+  type: http
+  seq: 7
+
+http:
+  method: GET
+  url: "{{store_url}}/ads/1"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يعرض تفاصيل إعلان واحد تابع للمتجر الحالي، مع الباقة ومعلومات المنتج أو القسم ومؤشرات الأداء لآخر سبعة أيام.
+
+  ## عنوان الطلب
+
+  GET {{store_url}}/ads/1
+
+  استبدل 1 بمعرّف الإعلان الرقمي المطلوب.
+
+  ## Path parameter
+
+  ad: مطلوب. معرّف الإعلان كعدد صحيح موجب. لا يمكن استعراض إعلان تابع لمتجر آخر.
+
+  ## Headers
+
+  Accept: مطلوب. application/json.
+
+  Accept-Language: اختياري. ar أو en لاختيار لغة رسالة الاستجابة والترجمات المرجعية.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب متجر، ويرثه من إعدادات المجموعة.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع بيانات الإعلان، الباقة، والعلاقات المتاحة. يتضمن metrics مجموع المشاهدات والنقرات والمحادثات والطلبات والإيراد لآخر سبعة أيام، ويتضمن daily_metrics القيم اليومية المسجلة خلال الفترة.
+
+  مثال: {"code":200,"message":"تم جلب تفاصيل الإعلان بنجاح.","data":{"id":1,"title":"عرض الصيف","status":"active","placement":"home","cost":"350.00","currency":"EGP","package":{"name":"باقة أسبوعية","duration_days":7},"metrics":{"impressions":120,"clicks":15,"chats_started":4,"orders_attributed":2,"revenue_attributed":"500.00"},"daily_metrics":[{"date":"2026-10-07","impressions":120,"clicks":15,"chats_started":4,"orders_attributed":2,"revenue_attributed":"500.00"}]}}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 404 إذا لم يوجد الإعلان أو لم يكن تابعًا للمتجر الحالي.
+
+  HTTP 422 إذا كان الحساب المصادق عليه ليس حساب متجر.

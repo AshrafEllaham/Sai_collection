@@ -47,6 +47,8 @@ docs: |-
   - email (string|null): البريد الإلكتروني.
   - facebook (string|null): رابط صفحة فيسبوك.
   - instagram (string|null): رابط صفحة إنستغرام.
+  - ad_pricing.home (string|null): تكلفة الإعلان في موضع الصفحة الرئيسية.
+  - ad_pricing.category (string|null): تكلفة الإعلان داخل صفحة القسم.
   - website_name (string|null): اسم الموقع باللغة المختارة.
   - about_app (string|null): رابط صفحة نبذة التطبيق باللغة المختارة.
   - privacy (string|null): رابط صفحة سياسة الخصوصية باللغة المختارة.
@@ -58,7 +60,7 @@ docs: |-
 
   مثال:
 
-  {"code":200,"data":{"whatsapp":"+201012345678","phone":"+201012345678","other_phone":"+201055555555","email":"support@example.com","facebook":"https://facebook.com/saey","instagram":"https://instagram.com/saey","website_name":"سعي","about_app":"http://127.0.0.1:8000/ar/about-app","privacy":"http://127.0.0.1:8000/ar/privacy","terms_conditions":"http://127.0.0.1:8000/ar/terms-conditions"},"message":"تم جلب إعدادات التطبيق بنجاح."}
+  {"code":200,"data":{"whatsapp":"+201012345678","phone":"+201012345678","other_phone":"+201055555555","email":"support@example.com","facebook":"https://facebook.com/saey","instagram":"https://instagram.com/saey","ad_pricing":{"home":"125.00","category":"75.00"},"website_name":"سعي","about_app":"http://127.0.0.1:8000/ar/about-app","privacy":"http://127.0.0.1:8000/ar/privacy","terms_conditions":"http://127.0.0.1:8000/ar/terms-conditions"},"message":"تم جلب إعدادات التطبيق بنجاح."}
 
   ## أخطاء التحقق
 

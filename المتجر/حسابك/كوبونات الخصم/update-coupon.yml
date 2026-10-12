@@ -1,0 +1,101 @@
+info:
+  name: تعديل كوبون متجر
+  type: http
+  seq: 4
+
+http:
+  method: PATCH
+  url: "{{store_url}}/coupons/1"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "code": "SAEY20",
+        "discount_type": "percentage",
+        "discount_value": 25,
+        "minimum_order_amount": 600,
+        "maximum_discount_amount": 300,
+        "max_uses": 120,
+        "max_uses_per_user": 1,
+        "starts_at": null,
+        "expires_at": "2027-12-31T23:59:59",
+        "is_active": true
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يحدّث بيانات كوبون مملوك للمتجر الحالي. الحقول المرسلة فقط هي التي تتغير.
+
+  ## عنوان الطلب
+
+  PATCH {{store_url}}/coupons/{coupon}
+
+  ## المصادقة
+
+  يتطلب Bearer token لحساب متجر، ويرثه من إعدادات المجموعة.
+
+  ## Path parameter
+
+  coupon: مطلوب. المعرّف الرقمي للكوبون المملوك للمتجر الحالي. غيّر 1 في URL إلى المعرّف المطلوب.
+
+  ## Headers
+
+  Accept: مطلوب. application/json.
+
+  Accept-Language: اختياري. ar أو en للرسائل.
+
+  Content-Type: مطلوب. application/json.
+
+  ## Body (JSON)
+
+  code: اختياري. من 3 إلى 20 حرفًا إنجليزيًا كبيرًا أو رقمًا أو _ أو -، وفريد داخل المتجر.
+
+  discount_type: اختياري. percentage للنسبة المئوية أو fixed للمبلغ الثابت.
+
+  discount_value: اختياري. رقم أكبر من صفر. النسبة المئوية لا تتجاوز 100.
+
+  minimum_order_amount: اختياري. رقم يساوي صفرًا أو أكثر.
+
+  maximum_discount_amount: اختياري. رقم أكبر من صفر أو null لإزالة السقف.
+
+  max_uses: اختياري. عدد صحيح لا يقل عن 1.
+
+  max_uses_per_user: اختياري. عدد صحيح لا يقل عن 1 ولا يتجاوز إجمالي max_uses.
+
+  starts_at: اختياري. تاريخ ووقت أو null.
+
+  expires_at: اختياري. تاريخ ووقت مستقبلي.
+
+  is_active: اختياري. true للتفعيل أو false للإيقاف.
+
+  قيم CouponDiscountTypeEnum: percentage تعني نسبة مئوية، وfixed تعني مبلغًا ثابتًا.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع بيانات الكوبون بعد التحديث.
+
+  مثال مختصر: {"code":200,"data":{"id":1,"code":"SAEY20","discount_value":"25.00","status":"active"}}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 404 إذا لم يوجد الكوبون أو لم يكن مملوكًا للمتجر الحالي.
+
+  HTTP 422 عند إرسال بيانات غير صالحة أو كود مستخدم مسبقًا في المتجر.

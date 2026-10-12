@@ -1,0 +1,56 @@
+info:
+  name: تفعيل أو إيقاف كوبون
+  type: http
+  seq: 5
+
+http:
+  method: PATCH
+  url: "{{store_url}}/coupons/1/toggle"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يبدّل حالة الكوبون النشط إلى paused أو يعيد الكوبون المتوقف إلى active.
+
+  ## عنوان الطلب
+
+  PATCH {{store_url}}/coupons/{coupon}/toggle
+
+  ## المصادقة
+
+  يتطلب Bearer token لحساب متجر، ويرثه من إعدادات المجموعة.
+
+  ## Path parameter
+
+  coupon: مطلوب. المعرّف الرقمي للكوبون المملوك للمتجر الحالي. غيّر 1 في URL إلى المعرّف المطلوب.
+
+  ## Headers
+
+  Accept: مطلوب. application/json.
+
+  Accept-Language: اختياري. ar أو en للرسائل.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع الكوبون وحالته الجديدة: active أو paused.
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 404 إذا لم يوجد الكوبون أو لم يكن مملوكًا للمتجر الحالي.
+
+  HTTP 422 إذا كانت حالة الكوبون expired أو exhausted، أو انتهى تاريخ صلاحيته، أو وصل إلى حد الاستخدام.

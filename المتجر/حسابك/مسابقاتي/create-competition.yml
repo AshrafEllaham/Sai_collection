@@ -1,0 +1,88 @@
+info:
+  name: إنشاء مسابقة متجر
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{store_url}}/competitions"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  body:
+    type: multipart-form
+    data:
+      - name: title
+        type: text
+        value: مسابقة العيد
+      - name: question
+        type: text
+        value: ما اسم أول منتج أطلقه المتجر؟
+      - name: prize
+        type: text
+        value: قسيمة شراء بقيمة 700 جنيه
+      - name: image
+        type: file
+        value:
+          - /home/nami/Pictures/Screenshots/Screenshot from 2026-10-11 18-38-00.png
+        contentType: image/png
+      - name: ends_at
+        type: text
+        value: 2027-10-10T10:05:00+02:00
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  ينشئ مسابقة جديدة مرتبطة بمتجر الحساب الحالي.
+
+  ## عنوان الطلب
+
+  POST {{store_url}}/competitions
+
+  ## المصادقة
+
+  يتطلب Bearer token لحساب متجر، ويرثه من إعدادات المجموعة.
+
+  ## Headers
+
+  Accept: مطلوب. application/json.
+
+  Accept-Language: اختياري. ar أو en لرسائل الرد.
+
+  Content-Type: يضبطه Bruno تلقائيًا مع حد multipart؛ لا تضفه يدويًا.
+
+  ## Body (multipart-form)
+
+  title (string، مطلوب): عنوان من 2 إلى 120 حرفًا.
+
+  question (string، مطلوب): سؤال من 3 إلى 5000 حرف.
+
+  prize (string، مطلوب): وصف الجائزة من 1 إلى 160 حرفًا.
+
+  image (file، اختياري): صورة بصيغة JPG أو JPEG أو PNG أو WEBP، بحد أقصى 5 ميجابايت.
+
+  ends_at (date-time، مطلوب): موعد مستقبلي لانتهاء المشاركة.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع المسابقة المنشأة وحالتها الافتراضية active.
+
+  مثال مختصر: {"code":200,"data":{"id":1,"title":"مسابقة الصيف","status":"active","entries_count":0}}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 422 عند نقص حقل مطلوب أو إدخال نص قصير أو طويل أو صورة غير مدعومة أو موعد غير مستقبلي.
+
+  HTTP 422 إذا لم يكن الحساب من نوع متجر.

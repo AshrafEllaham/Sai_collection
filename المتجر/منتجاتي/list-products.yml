@@ -1,0 +1,109 @@
+info:
+  name: قائمة منتجات المتجر
+  type: http
+  seq: 5
+
+http:
+  method: GET
+  url: "{{store_url}}/products?pagination=on&limit_per_page=10&status=published&category_id=2&order_by=recent&search=جاكيت&stock_status=all"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  params:
+    - name: pagination
+      value: on
+      type: query
+      description: التقسيم مفعّل دائمًا لهذا endpoint؛ القيمة on للتوضيح فقط.
+    - name: limit_per_page
+      value: "10"
+      type: query
+      description: اختياري. عدد المنتجات في الصفحة من 1 إلى 100؛ الافتراضي 10.
+    - name: status
+      value: published
+      type: query
+      description: اختياري. حالة المنتج؛ القيم من ProductStatusEnum موضحة في docs.
+    - name: category_id
+      value: "2"
+      type: query
+      description: اختياري. معرّف قسم فرعي نشط فقط.
+    - name: order_by
+      value: recent
+      type: query
+      description: اختياري. recent أو orders أو views؛ الافتراضي recent.
+    - name: search
+      value: جاكيت
+      type: query
+      description: اختياري. البحث في اسم المنتج أو اسم القسم الفرعي، حتى 255 حرفًا.
+    - name: stock_status
+      value: all
+      type: query
+      description: اختياري. all أو available أو low أو out؛ الافتراضي all.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  جلب منتجات حساب المتجر الحالي مرتبة من الأحدث إلى الأقدم مع تقسيم النتائج إلى صفحات.
+
+  ## عنوان الطلب
+
+  GET {{store_url}}/products
+
+  تستخدم المجموعة المتغير store_url لضبط العنوان الأساسي.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب نوعه store، ويرثه الطلب من إعدادات المجموعة.
+
+  ## Query parameters
+
+  page: اختياري. رقم الصفحة، عدد صحيح يبدأ من 1. الافتراضي 1.
+
+  limit_per_page: اختياري. عدد المنتجات في الصفحة من 1 إلى 100. الافتراضي 10.
+
+  status: اختياري. قيمة من ProductStatusEnum: draft للمسودة، pending_review لقيد المراجعة، published للمنشور، hidden للمخفي، out_of_stock لنفاد المخزون.
+
+  category_id: اختياري. معرّف قسم فرعي نشط فقط، ويجب أن يكون عددًا صحيحًا.
+
+  order_by: اختياري. recent للأحدث، orders للأكثر طلبًا، views للأكثر مشاهدة. الافتراضي recent.
+
+  search: اختياري. يبحث في اسم المنتج أو اسم القسم الفرعي بلغة Accept-Language، حتى 255 حرفًا.
+
+  stock_status: اختياري. all لكل الحالات، available للمخزون المتاح فوق حد المخزون المنخفض، low للمخزون الأكبر من صفر وحتى الحد المنخفض، out للمخزون المنتهي.
+
+  pagination: التقسيم مفعّل دائمًا لهذا endpoint. القيمة on للتوضيح فقط، وإرسال off لا يعطّل التقسيم.
+
+  ## Headers
+
+  Accept: مطلوب. القيمة application/json.
+
+  Accept-Language: اختياري. ar أو en لتحديد لغة رسالة الاستجابة.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع data كقائمة منتجات وحقول pagination مثل current_page وlast_page وper_page وtotal.
+
+  تتضمن بيانات المنتج حالته وسعره ومخزونه وصوره ومميزاته واسم القسم الفرعي.
+
+  مثال:
+
+  {"code":200,"data":[{"id":12,"store_id":3,"name":"جاكيت جلد طبيعي","status":"published","price":"1850.00","stock_quantity":18,"media":[],"features":[]}],"current_page":1,"last_page":2,"per_page":10,"total":12,"message":"تم جلب منتجات المتجر بنجاح."}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 422 إذا لم يكن الحساب من نوع store، أو كان page أقل من 1، أو كان limit_per_page خارج 1 إلى 100، أو كانت قيمة أي فلتر غير صالحة.
+
+  views يعتمد على مجموع impressions للإعلانات المرتبطة بالمنتج؛ لا يوجد حاليًا عداد لمشاهدات صفحة المنتج.
+
+  مثال خطأ تحقق: {"code":422,"message":"رقم الصفحة يجب أن يبدأ من 1."}

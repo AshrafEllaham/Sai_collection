@@ -1,0 +1,47 @@
+info:
+  name: حذف منتج
+  type: http
+  seq: 4
+
+http:
+  method: DELETE
+  url: "{{store_url}}/products/1"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  حذف منتج يملكه حساب المتجر الحالي. يستخدم التطبيق soft delete للاحتفاظ بالسجل المحذوف.
+
+  ## عنوان الطلب
+
+  DELETE {{store_url}}/products/{{product_id}}
+
+  ## Path parameter
+
+  product_id: مطلوب. المعرّف الرقمي للمنتج المملوك للحساب الحالي.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب نوعه store.
+
+  ## Body
+
+  لا يتطلب هذا الطلب body.
+
+  ## الاستجابة الناجحة
+
+  يعيد HTTP 200 ورسالة نجاح دون بيانات عنصر.
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 404 إذا لم يوجد المنتج أو لم يكن مملوكًا للحساب الحالي.

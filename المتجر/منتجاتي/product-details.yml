@@ -1,0 +1,76 @@
+info:
+  name: تفاصيل المنتج
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: "{{store_url}}/products/1"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  جلب تفاصيل منتج المتجر مع ملخص المبيعات المكتملة ومؤشرات الإعلانات والتقييمات.
+
+  ## عنوان الطلب
+
+  GET {{store_url}}/products/{{product_id}}
+
+  استبدل 1 في عنوان الطلب بمعرّف المنتج المطلوب.
+
+  ## Path parameter
+
+  product_id: مطلوب. معرّف رقمي لمنتج مملوك لحساب المتجر الحالي.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب نوعه store، ويرثه الطلب من إعدادات المجموعة.
+
+  ## Headers
+
+  Accept: مطلوب. القيمة application/json.
+
+  Accept-Language: اختياري. ar أو en لتحديد لغة رسالة الاستجابة واسم القسم.
+
+  ## Body
+
+  لا يتطلب هذا الطلب body.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع data.product التي تتضمن بيانات المنتج والقسم والصور والمميزات.
+
+  data.analytics.sales تعرض قيمة المنتجات المباعة في الطلبات المكتملة، وعدد الطلبات والوحدات، ومبيعات آخر 30 يومًا.
+
+  daily_sales يحتوي على 30 قيمة يومية من الأقدم إلى الأحدث، بما فيها الأيام التي لا توجد فيها مبيعات.
+
+  data.analytics.ads تعرض مرات ظهور إعلانات المنتج ونقراتها والمحادثات والطلبات المنسوبة ومعدل التحويل.
+
+  معدل التحويل هو الطلبات المنسوبة إلى الإعلانات مقسومة على مرات الظهور، ويكون null عند عدم وجود مرات ظهور.
+
+  data.analytics.reviews تعرض متوسط وعدد التقييمات الظاهرة، ومصفوفة من عناصر rating وtotal لتوزيع التقييمات من 1 إلى 5، وآخر تقييم ظاهر إن وجد.
+
+  مثال مختصر:
+
+  {"code":200,"data":{"product":{"id":1,"store_id":3,"name":"جاكيت جلد طبيعي","status":"published","price":"1850.00","stock_quantity":18,"media":[],"features":[]},"analytics":{"sales":{"total_revenue":0,"completed_orders_count":0,"units_sold":0,"revenue_last_30_days":0,"units_sold_last_30_days":0,"daily_sales":[{"date":"2026-09-10","revenue":0},{"date":"2026-09-11","revenue":0}]},"ads":{"impressions":0,"clicks":0,"chats_started":0,"orders_attributed":0,"conversion_rate":null},"reviews":{"average_rating":null,"total_reviews":0,"rating_distribution":[{"rating":1,"total":0},{"rating":2,"total":0},{"rating":3,"total":0},{"rating":4,"total":0},{"rating":5,"total":0}],"latest":null}}},"message":"تم جلب تفاصيل المنتج بنجاح."}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 404 إذا لم يوجد المنتج أو لم يكن مملوكًا للحساب الحالي.
+
+  HTTP 422 إذا لم يكن الحساب من نوع store.

@@ -1,0 +1,111 @@
+info:
+  name: "إضافة منتج جديد"
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{store_url}}/products"
+  body:
+    type: multipart-form
+    data:
+      - name: name
+        type: text
+        value: جاكيت جلد طبيعي
+        description: "مطلوب. من حرفين إلى 255 حرفًا."
+      - name: category_id
+        type: text
+        value: "1"
+        description: "مطلوب. معرّف قسم نشط من GET {{general_url}}/sub-categories."
+      - name: description
+        type: text
+        value: جاكيت رجالي من الجلد الطبيعي
+        description: "مطلوب. حتى 300 حرف."
+      - name: features[]
+        type: text
+        value: خامة جلد طبيعي
+        description: "اختياري ومتكرر. حتى 8 مميزات، كل ميزة حتى 80 حرفًا."
+      - name: price
+        type: text
+        value: "1850"
+        description: "مطلوب. رقم أكبر من صفر. السعر الحالي بعد الخصم عند وجوده."
+      - name: stock_quantity
+        type: text
+        value: "18"
+        description: "مطلوب. عدد صحيح لا يقل عن صفر."
+      - name: discount_percentage
+        type: text
+        value: "10"
+        description: "اختياري. نسبة من 1 إلى 90. يتطلب discount_ends_at."
+      - name: discount_ends_at
+        type: text
+        value: "2027-01-31T23:59:00"
+        description: "اختياري، مطلوب عند إرسال discount_percentage. تاريخ مستقبلي."
+      - name: images[]
+        type: file
+        value: []
+        contentType: image/jpeg
+        description: "اختياري ومتكرر. حتى 6 صور JPG أو JPEG أو PNG أو WEBP، كل صورة حتى 5MB."
+      - name: publish
+        type: text
+        value: "1"
+        description: "اختياري. 1 للنشر مباشرة أو 0 للحفظ كمسودة. الافتراضي 1."
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  إنشاء منتج جديد للحساب المتجر الحالي مع بياناته ومميزاته وصوره الاختيارية.
+
+  ## عنوان الطلب
+
+  POST {{store_url}}/products
+
+  قيمة store_url الحالية هي http://127.0.0.1:8000/api/store.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب نوعه store.
+
+  ## Body (multipart-form)
+
+  name: مطلوب. اسم المنتج، من حرفين إلى 255 حرفًا.
+
+  category_id: مطلوب. معرّف قسم نشط. استخرج المعرّف من GET {{general_url}}/sub-categories.
+
+  description: مطلوب. وصف المنتج، بحد أقصى 300 حرف.
+
+  features[]: اختياري ومتكرر. حتى 8 قيم، بحد أقصى 80 حرفًا لكل ميزة.
+
+  price: مطلوب. رقم أكبر من صفر، ويمثل السعر الحالي.
+
+  stock_quantity: مطلوب. عدد صحيح يساوي صفرًا أو أكثر.
+
+  discount_percentage: اختياري. نسبة بين 1 و90. عند إرساله يجب إرسال discount_ends_at.
+
+  discount_ends_at: اختياري، ومطلوب مع discount_percentage. يجب أن يكون تاريخًا مستقبليًا.
+
+  images[]: اختياري ومتكرر. حتى 6 صور JPG أو JPEG أو PNG أو WEBP، بحد أقصى 5MB للصورة.
+
+  publish: اختياري. أرسل 1 للنشر أو 0 للحفظ كمسودة. القيمة الافتراضية 1.
+
+  لا يحتوي الطلب على حقول Enum.
+
+  ## الاستجابة الناجحة
+
+  يعيد الخادم HTTP 200 مع بيانات المنتج ومعرّفه وحالته والصور والمميزات.
+
+  ## أخطاء مهمة
+
+  يعيد الخادم HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  يعيد الخادم HTTP 422 عند نقص حقل مطلوب أو اختيار قسم غير نشط أو إرسال سعر أو خصم أو صورة غير صالحة.
+
+  يعيد الخادم HTTP 422 عندما لا يكون الحساب الحالي من نوع store.

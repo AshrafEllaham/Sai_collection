@@ -16,7 +16,7 @@ http:
     data:
       - name: email
         type: text
-        value: existing.user@example.com
+        value: new.user@example.com
         description: اختياري عند استخدام رقم الهاتف. أرسل البريد أو بيانات الهاتف فقط.
       - name: phone_code
         type: text

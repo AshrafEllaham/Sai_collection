@@ -1,0 +1,80 @@
+info:
+  name: سحب فائز المسابقة
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{store_url}}/competitions/1/draw"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "correct_answer": "القاهرة"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  ينفذ سحبًا عشوائيًا بين إجابات المشاركين المطابقة للإجابة المعتمدة، ثم يحفظ الفائز ووقت السحب.
+
+  ## عنوان الطلب
+
+  POST {{store_url}}/competitions/{competition}/draw
+
+  ## المصادقة
+
+  يتطلب Bearer token لحساب متجر، ويرثه من إعدادات المجموعة.
+
+  ## Path parameter
+
+  competition: مطلوب. المعرّف الرقمي للمسابقة المملوكة للمتجر الحالي. غيّر 1 في URL إلى المعرّف المطلوب.
+
+  ## Headers
+
+  Accept: مطلوب. application/json.
+
+  Accept-Language: اختياري. ar أو en لرسائل الرد.
+
+  Content-Type: مطلوب. application/json.
+
+  ## Body (JSON)
+
+  correct_answer (string، مطلوب): الإجابة المعتمدة، من حرف إلى 255 حرفًا. تزال التشكيلات وتوحّد أشكال الهمزة والمسافات عند المطابقة.
+
+  ## قواعد السحب
+
+  لا يبدأ السحب قبل موعد انتهاء المسابقة.
+
+  يجب أن توجد إجابة واحدة على الأقل مطابقة للإجابة المعتمدة.
+
+  المسابقة الملغاة أو التي تم السحب عليها لا تقبل سحبًا جديدًا.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع بيانات المسابقة، الفائز، إجابته، وعدد المشاركات المطابقة.
+
+  مثال مختصر: {"code":200,"data":{"winner":{"id":12,"name":"محمد أحمد","answer":"القاهرة"},"eligible_count":4}}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 404 إذا لم توجد المسابقة أو لم تكن مملوكة للمتجر الحالي.
+
+  HTTP 422 عند غياب الإجابة أو إذا لم تنتهِ المسابقة أو لم توجد إجابات مطابقة أو سبق تنفيذ السحب.

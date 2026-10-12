@@ -1,0 +1,54 @@
+info:
+  name: رصيد محفظة الإعلانات
+  type: http
+  seq: 8
+
+http:
+  method: GET
+  url: "{{store_url}}/ads/wallet-balance"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يعرض الرصيد المتاح في المحفظة النشطة لحساب المتجر، لاستخدامه قبل تأكيد إرسال إعلان مدفوع للمراجعة.
+
+  ## عنوان الطلب
+
+  GET {{store_url}}/ads/wallet-balance
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب من نوع store، ويرثه من إعدادات المجموعة.
+
+  ## Headers
+
+  Accept: مطلوب. application/json.
+
+  Accept-Language: اختياري. ar أو en للغة الرسائل.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع balance كرصد متاح بصيغة عشرية وcurrency كرمز العملة.
+
+  إذا لم توجد محفظة نشطة، يعيد الخادم balance بقيمة 0.00 وcurrency بقيمة null.
+
+  مثال: {"code":200,"data":{"balance":"500.00","currency":"EGP"}}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 422 إذا لم يكن الحساب الحالي حساب متجر.

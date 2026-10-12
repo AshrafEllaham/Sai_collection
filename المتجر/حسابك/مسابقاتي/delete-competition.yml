@@ -1,0 +1,56 @@
+info:
+  name: حذف مسابقة متجر
+  type: http
+  seq: 5
+
+http:
+  method: DELETE
+  url: "{{store_url}}/competitions/1"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يحذف مسابقة مملوكة للمتجر الحالي باستخدام الحذف الناعم.
+
+  ## عنوان الطلب
+
+  DELETE {{store_url}}/competitions/{competition}
+
+  ## المصادقة
+
+  يتطلب Bearer token لحساب متجر، ويرثه من إعدادات المجموعة.
+
+  ## Path parameter
+
+  competition: مطلوب. المعرّف الرقمي للمسابقة. غيّر 1 في URL إلى المعرّف المطلوب.
+
+  ## Headers
+
+  Accept: مطلوب. application/json.
+
+  Accept-Language: اختياري. ar أو en لرسائل الرد.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع data فارغة ورسالة تؤكد الحذف.
+
+  مثال مختصر: {"code":200,"data":null,"message":"The competition was deleted successfully."}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 404 إذا لم توجد المسابقة أو لم تكن مملوكة للمتجر الحالي.

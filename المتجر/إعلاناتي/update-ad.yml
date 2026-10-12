@@ -1,0 +1,111 @@
+info:
+  name: تعديل إعلان
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{store_url}}/ads/1"
+  body:
+    type: multipart-form
+    data:
+      - name: _method
+        type: text
+        value: PATCH
+        description: مطلوب لتوجيه multipart إلى مسار PATCH مع دعم رفع الملفات في PHP.
+      - name: title
+        type: text
+        value: عرض الصيف المحدث
+        description: اختياري. عند إرساله من حرفين إلى 120 حرفًا.
+      - name: ad_package_id
+        type: text
+        value: "1"
+        description: اختياري. معرّف باقة نشطة؛ عند تغييره تتحدث التكلفة والعملة.
+      - name: placement
+        type: text
+        value: category
+        description: اختياري. home أو category أو storefront.
+      - name: action
+        type: text
+        value: view_product
+        description: اختياري. قيمة من AdActionEnum الموضحة في docs.
+      - name: media_type
+        type: text
+        value: image
+        description: مطلوب عند رفع media. image أو video أو file.
+      - name: media
+        type: file
+        value: []
+        contentType: image/jpeg
+        description: اختياري. JPG أو JPEG أو PNG أو WEBP أو MP4، حتى 20MB.
+      - name: action_label
+        type: text
+        value: اكتشف العرض
+        description: اختياري. حتى 60 حرفًا.
+      - name: caption
+        type: text
+        value: وصف محدث
+        description: اختياري. حتى 2000 حرف.
+      - name: starts_at
+        type: text
+        value: "2026-11-02T10:00:00+02:00"
+        description: اختياري. تاريخ مستقبلي بصيغة تاريخ ووقت.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يعدل حقول الإعلان المحدد للمتجر الحالي. الحقول غير المرسلة تبقى كما هي.
+
+  ## عنوان الطلب
+
+  POST {{store_url}}/ads/{ad} مع _method=PATCH لدعم multipart في PHP.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب من نوع store، ويرثه من إعدادات المجموعة.
+
+  ## Path parameters
+
+  ad: مطلوب. المعرّف الرقمي للإعلان المملوك للمتجر الحالي.
+
+  ## Body (multipart-form)
+
+  _method: مطلوب. القيمة PATCH لتوجيه الطلب إلى مسار التعديل.
+
+  title: اختياري. من حرفين إلى 120 حرفًا.
+
+  ad_package_id: اختياري. معرّف باقة نشطة؛ يؤدي تغييره إلى تحديث التكلفة والعملة.
+
+  placement: اختياري. home للصفحة الرئيسية، category لصفحة القسم، storefront لواجهة المتجر.
+
+  action: اختياري. view_product لفتح المنتج، view_store لفتح المتجر، start_chat لبدء محادثة، buy_now لبدء الشراء.
+
+  media_type: مطلوب عند رفع media. image أو video أو file.
+
+  media: اختياري. JPG أو JPEG أو PNG أو WEBP أو MP4، بحد أقصى 20MB.
+
+  action_label: اختياري. حتى 60 حرفًا.
+
+  caption: اختياري. حتى 2000 حرف.
+
+  starts_at: اختياري. تاريخ ووقت مستقبلي.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع بيانات الإعلان بعد التعديل.
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 404 عندما لا يكون الإعلان موجودًا أو لا يخص المتجر الحالي.
+
+  HTTP 422 عند قيمة حقل غير صالحة أو باقة غير نشطة أو ملف غير مدعوم.

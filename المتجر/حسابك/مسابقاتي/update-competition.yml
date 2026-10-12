@@ -1,0 +1,99 @@
+info:
+  name: تعديل مسابقة متجر
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{store_url}}/competitions/1"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  body:
+    type: multipart-form
+    data:
+      - name: _method
+        type: text
+        value: PATCH
+      - name: title
+        type: text
+        value: مسابقة العيد الكبرى
+      - name: question
+        type: text
+        value: ما اسم أول منتج أطلقه المتجر؟
+      - name: prize
+        type: text
+        value: قسيمة شراء بقيمة 700 جنيه
+      - name: image
+        type: file
+        value:
+          - /home/nami/Pictures/Screenshots/Screenshot from 2026-10-11 18-38-00.png
+        contentType: image/png
+      - name: ends_at
+        type: text
+        value: 2027-10-10T10:05:00+02:00
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يحدّث حقول مسابقة يملكها المتجر الحالي.
+
+  ## عنوان الطلب
+
+  POST {{store_url}}/competitions/{competition} مع حقل _method=PATCH
+
+  ## المصادقة
+
+  يتطلب Bearer token لحساب متجر، ويرثه من إعدادات المجموعة.
+
+  ## Path parameter
+
+  competition: مطلوب. المعرّف الرقمي للمسابقة. غيّر 1 في URL إلى المعرّف المطلوب.
+
+  ## Headers
+
+  Accept: مطلوب. application/json.
+
+  Accept-Language: اختياري. ar أو en لرسائل الرد.
+
+  Content-Type: يضبطه Bruno تلقائيًا مع حد multipart؛ لا تضفه يدويًا.
+
+  ## Body (multipart-form)
+
+  الحقول النصية هنا تُرسل كنصوص multipart. العنوان والسؤال والجائزة وموعد الانتهاء مطلوبة في نموذج المعاينة؛ واجهة الـ API تقبل إرسال ما تريد تحديثه فقط.
+
+  _method (string، مطلوب): أرسل PATCH كي يعالج Laravel الطلب كعملية تعديل مع رفع الملف.
+
+  title (string): من 2 إلى 120 حرفًا.
+
+  question (string): من 3 إلى 5000 حرف.
+
+  prize (string): من 1 إلى 160 حرفًا.
+
+  image (file، اختياري): صورة جديدة بصيغة JPG أو JPEG أو PNG أو WEBP، بحد أقصى 5 ميجابايت. حذف الحقل يبقي الصورة الحالية كما هي.
+
+  ends_at (date-time): موعد مستقبلي بصيغة ISO 8601.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع بيانات المسابقة بعد التحديث.
+
+  مثال مختصر: {"code":200,"data":{"id":1,"title":"مسابقة الصيف الكبرى","status":"active"}}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 404 إذا لم توجد المسابقة أو لم تكن مملوكة للمتجر الحالي.
+
+  HTTP 422 عند إدخال غير صالح أو موعد انتهاء غير مستقبلي.
