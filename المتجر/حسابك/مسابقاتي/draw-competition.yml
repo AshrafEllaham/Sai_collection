@@ -14,11 +14,11 @@ http:
     - name: Content-Type
       value: application/json
   body:
-    type: json
-    data: |-
-      {
-        "correct_answer": "القاهرة"
-      }
+    type: multipart-form
+    data:
+      - name: correct_answer
+        type: text
+        value: القاهرة
   auth: inherit
 
 settings:

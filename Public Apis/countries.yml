@@ -1,7 +1,7 @@
 info:
   name: قائمة الدول
   type: http
-  seq: 7
+  seq: 8
 
 http:
   method: GET
@@ -13,13 +13,13 @@ http:
       value: ar
   params:
     - name: pagination
-      value: "off"
+      value: off
       type: query
-      description: "اختياري. أرسل on لتفعيل تقسيم الصفحات أو off لإرجاع القائمة كاملة؛ الافتراضي off."
+      description: اختياري. أرسل on لتفعيل تقسيم الصفحات أو off لإرجاع القائمة كاملة؛ الافتراضي off.
     - name: limit_per_page
       value: "10"
       type: query
-      description: "اختياري. عدد العناصر من 1 إلى 100 عند pagination=on؛ الافتراضي 10."
+      description: اختياري. عدد العناصر من 1 إلى 100 عند pagination=on؛ الافتراضي 10.
 
 settings:
   encodeUrl: true

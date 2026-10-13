@@ -1,0 +1,79 @@
+info:
+  name: "الأقسام الرئيسية "
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: "{{user_ur}}/main-categories?pagination=on&limit_per_page=8"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  params:
+    - name: pagination
+      value: on
+      type: query
+      description: اختياري. on لتفعيل الترقيم أو off لإرجاع القائمة كاملة؛ الافتراضي off.
+    - name: limit_per_page
+      value: "8"
+      type: query
+      description: اختياري. عدد العناصر من 1 إلى 100؛ الافتراضي 10.
+    - name: search
+      value: ملابس
+      type: query
+      description: اختياري. البحث الجزئي في اسم القسم باللغة المحددة في Accept-Language؛ حتى 120 حرفًا.
+      disabled: true
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يعرض الأقسام الرئيسية النشطة فقط في صفحة المستخدم الرئيسية بترتيب العرض المعتمد.
+
+  ## عنوان الطلب
+
+  GET {{user_ur}}/main-categories
+
+  متغير user_ur الحالي: http://127.0.0.1:8000/api/user
+
+  ## المصادقة
+
+  هذا المسار عام ولا يتطلب Bearer token؛ يمكن إرسال access_token إن كان مضبوطًا في المجموعة.
+
+  ## Headers
+
+  - Accept (مطلوب): application/json.
+  - Accept-Language (اختياري): ar أو en لتحديد لغة الأسماء والرسائل.
+
+  ## Query parameters
+
+  - limit_per_page (اختياري): عدد الأقسام في الصفحة، عدد صحيح من 1 إلى 100. الافتراضي 10.
+  - page (اختياري): رقم الصفحة، عدد صحيح يبدأ من 1. الافتراضي 1.
+  - pagination (اختياري): on لتفعيل ترقيم الصفحات أو off لإرجاع القائمة كاملة؛ الافتراضي off.
+  - search (اختياري): يرشح الأقسام حسب جزء من الاسم المترجم للغة المحددة في Accept-Language؛ حتى 120 حرفًا.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع data.
+  عند pagination=on، يضاف current_page وlast_page وper_page وtotal.
+  كل عنصر يحتوي id وname وdescription وimage.
+
+  مثال: {"code":200,"data":[{"id":1,"name":"أزياء وملابس","description":null,"image":null}],"current_page":1,"last_page":2,"per_page":8,"total":9}
+
+  ## أخطاء مهمة
+
+  HTTP 422 إذا كان limit_per_page أكبر من 100 أو أقل من 1.
+  HTTP 422 إذا كان page غير صحيح أو أقل من 1.
+  HTTP 422 إذا كانت pagination بقيمة غير on أو off.
+  HTTP 422 إذا كان search غير نصي أو أطول من 120 حرفًا.
+
+  مثال: {"code":422,"message":"رقم الصفحة يجب أن يبدأ من 1."}

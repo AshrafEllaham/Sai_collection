@@ -16,7 +16,7 @@ http:
     data:
       - name: email
         type: text
-        value: new.user@example.com
+        value: store@gmail.com
         description: اختياري عند استخدام رقم الهاتف. أرسل البريد أو بيانات الهاتف فقط.
       - name: phone_code
         type: text
@@ -28,7 +28,7 @@ http:
         description: رقم الهاتف من 6 إلى 20 رقمًا دون كود الدولة.
       - name: password
         type: text
-        value: StrongPass123
+        value: "12345678"
         description: كلمة مرور الحساب.
 
 runtime:

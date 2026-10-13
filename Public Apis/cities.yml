@@ -1,7 +1,7 @@
 info:
   name: قائمة المدن
   type: http
-  seq: 9
+  seq: 10
 
 http:
   method: GET
@@ -15,15 +15,15 @@ http:
     - name: governorate_id
       value: "1"
       type: query
-      description: "اختياري. معرّف محافظة نشطة لتصفية المدن التابعة لها فقط؛ احذفه لإرجاع كل المدن النشطة."
+      description: اختياري. معرّف محافظة نشطة لتصفية المدن التابعة لها فقط؛ احذفه لإرجاع كل المدن النشطة.
     - name: pagination
-      value: "off"
+      value: off
       type: query
-      description: "اختياري. أرسل on لتفعيل تقسيم الصفحات أو off لإرجاع القائمة كاملة؛ الافتراضي off."
+      description: اختياري. أرسل on لتفعيل تقسيم الصفحات أو off لإرجاع القائمة كاملة؛ الافتراضي off.
     - name: limit_per_page
       value: "10"
       type: query
-      description: "اختياري. عدد العناصر من 1 إلى 100 عند pagination=on؛ الافتراضي 10."
+      description: اختياري. عدد العناصر من 1 إلى 100 عند pagination=on؛ الافتراضي 10.
 
 settings:
   encodeUrl: true

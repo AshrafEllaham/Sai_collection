@@ -1,0 +1,72 @@
+info:
+  name: تبديل عنصر في المفضلة
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{user_ur}}/favorites/toggle"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "type": "product",
+        "favoriteable_id": 1
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يبدل حالة منتج أو متجر في مفضلة المستخدم الحالي. الإرسال الأول يضيف العنصر، والإرسال التالي بالقيم نفسها يزيله.
+
+  ## عنوان الطلب
+
+  POST {{user_ur}}/favorites/toggle
+
+  قيمة user_ur في المجموعة: http://127.0.0.1:8000/api/user
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لمستخدم مسجل الدخول، ويرثه الطلب من إعدادات المجموعة.
+
+  ## Headers
+
+  - Accept (مطلوب): application/json.
+  - Content-Type (مطلوب): application/json.
+  - Accept-Language (اختياري): ar أو en لتحديد لغة الرسالة.
+
+  ## Body
+
+  - type (مطلوب): نوع العنصر؛ القيم المسموحة product للمنتج وstore للمتجر.
+  - favoriteable_id (مطلوب): معرّف رقمي أكبر من صفر لمنتج أو متجر موجود حسب type.
+
+  غيّر type وfavoriteable_id معًا إلى العنصر المطلوب.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 ويحتوي data.type وdata.favoriteable_id على العنصر، وdata.is_favorite على الحالة الجديدة.
+
+  مثال إضافة: {"code":200,"message":"تمت إضافة العنصر إلى المفضلة.","data":{"type":"product","favoriteable_id":1,"is_favorite":true}}
+
+  مثال إزالة: {"code":200,"message":"تمت إزالة العنصر من المفضلة.","data":{"type":"product","favoriteable_id":1,"is_favorite":false}}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب Bearer token أو عدم صلاحيته.
+
+  HTTP 422 إذا كان type غير product أو store، أو كان favoriteable_id مفقودًا أو غير رقمي أو لا يشير إلى عنصر موجود.
