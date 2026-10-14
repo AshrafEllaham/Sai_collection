@@ -1,0 +1,65 @@
+info:
+  name: أسباب الإبلاغ
+  type: http
+  seq: 9
+
+http:
+  method: GET
+  url: "{{user_ur}}/report-reasons?type=product"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  params:
+    - name: type
+      value: product
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يجلب عناوين أسباب الإبلاغ التي يديرها المشرف، بلغة الطلب ونوع العنصر المحدد.
+
+  ## عنوان الطلب
+
+  GET {{user_ur}}/report-reasons?type=product
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا، ويرثه الطلب من المجموعة.
+
+  ## Headers
+
+  - Accept (مطلوب): application/json.
+  - Accept-Language (اختياري): ar أو en لاختيار لغة العناوين والرسالة.
+
+  ## Query
+
+  - type (مطلوب): نوع العنصر المراد الإبلاغ عنه.
+
+  - product: أسباب الإبلاغ عن المنتجات.
+
+  - store: أسباب الإبلاغ عن المتاجر.
+
+  لا يوجد Path أو Body لهذا الطلب.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع قائمة data من id وtype وtitle.
+
+  مثال: {"code":200,"message":"تم جلب أسباب الإبلاغ بنجاح.","data":[{"id":1,"type":"product","title":"معلومات أو سعر غير صحيح"}]}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 422 عند غياب type أو إرسال قيمة غير store أو product.

@@ -1,0 +1,79 @@
+info:
+  name: المنتجات المقترحة
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{user_ur}}/products/recommended?limit_per_page=6&page=1"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  params:
+    - name: limit_per_page
+      value: "6"
+      type: query
+      description: اختياري. عدد المنتجات المقترحة في الصفحة من 1 إلى 100؛ الافتراضي 10.
+    - name: page
+      value: "1"
+      type: query
+      description: اختياري. رقم الصفحة ويبدأ من 1.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يعرض قائمة منتجات مخصصة للمستخدم الحالي داخل محافظته، أو من جميع المحافظات إذا لم يحدد المستخدم محافظة في ملفه.
+
+  ترتب النتائج أولًا بحسب الأقسام التي اشترى منها المستخدم في طلبات مكتملة، ثم الأقسام التي أضاف منتجاتها إلى المفضلة، ثم متوسط التقييم وعدد التقييمات والمبيعات والحداثة.
+
+  إذا لم يملك المستخدم مشتريات مكتملة أو مفضلات، تصبح النتائج قائمة عامة مرتبة حسب التقييم والمبيعات والحداثة داخل محافظته.
+
+  ## عنوان الطلب
+
+  GET {{user_ur}}/products/recommended
+
+  قيمة user_ur في المجموعة: http://127.0.0.1:8000/api/user
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لمستخدم مسجل الدخول، ويرثه الطلب من إعدادات المجموعة.
+
+  ## Headers
+
+  - Accept (مطلوب): application/json.
+
+  - Accept-Language (اختياري): ar أو en لاختيار ترجمة اسم القسم ورسالة الاستجابة.
+
+  ## Query parameters
+
+  - limit_per_page (اختياري): عدد النتائج في الصفحة من 1 إلى 100؛ الافتراضي 10.
+
+  - page (اختياري): رقم الصفحة، عدد صحيح يبدأ من 1؛ الافتراضي 1.
+
+  تقسيم الصفحات مفعل دائمًا لهذا المسار.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع قائمة data ومعلومات current_page وlast_page وper_page وtotal.
+
+  كل منتج يعرض id وcategory_id وcategory_name وname وprice وoriginal_price وdiscount_percentage وimage وis_favorite وaverage_rating وreviews_count وunits_sold.
+
+  مثال:
+
+  {"code":200,"message":"تم جلب المنتجات المقترحة بنجاح.","data":[{"id":12,"category_id":2,"category_name":"ملابس رجالية","name":"قميص قطني","price":"620.00","original_price":null,"discount_percentage":null,"image":null,"is_favorite":false,"average_rating":4.7,"reviews_count":18,"units_sold":187}],"current_page":1,"last_page":2,"per_page":6,"total":9}
+
+  ## أخطاء التحقق
+
+  HTTP 401 عند غياب Bearer token صالح.
+
+  HTTP 422 إذا كان limit_per_page خارج النطاق من 1 إلى 100 أو كان page أقل من 1 أو ليس عددًا صحيحًا.

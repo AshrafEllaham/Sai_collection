@@ -1,0 +1,102 @@
+info:
+  name: المنتجات المشابهة
+  type: http
+  seq: 7
+
+http:
+  method: GET
+  url: "{{user_ur}}/products/1/similar-products?sort=newest&pagination=on&limit_per_page=10"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  params:
+    - name: sub_category_id
+      value: "2"
+      type: query
+      description: اختياري. قسم فرعي نشط؛ يجب أن يتبع القسم الرئيسي إذا أُرسل الاثنان.
+      disabled: true
+    - name: governorate_id
+      value: "1"
+      type: query
+      description: اختياري. محافظة نشطة؛ يعرض منتجات المتاجر الموجودة فيها فقط.
+      disabled: true
+    - name: search
+      value: قميص
+      type: query
+      description: اختياري. بحث جزئي في اسم المنتج حتى 120 حرفًا.
+      disabled: true
+    - name: sort
+      value: newest
+      type: query
+      description: اختياري. newest للمضاف حديثًا، most_purchased للأكثر شراءً، highest_rated للأعلى تقييمًا؛ الافتراضي most_purchased.
+    - name: pagination
+      value: on
+      type: query
+      description: الصفحة مقسمة دائمًا؛ القيمة on.
+    - name: limit_per_page
+      value: "10"
+      type: query
+      description: اختياري. عدد النتائج في الصفحة من 1 إلى 100؛ الافتراضي 10.
+    - name: product
+      value: "1"
+      type: path
+      description: مطلوب. معرّف المنتج المرجعي المنشور الذي نبحث عن منتجات من قسمه نفسه.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يعرض منتجات منشورة ومتاحة من القسم نفسه للمنتج المرجعي، ويستبعد المنتج المرجعي.
+
+  ## عنوان الطلب
+
+  GET {{user_ur}}/products/{product}/similar-products
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لمستخدم مسجل الدخول؛ يرثه الطلب من المجموعة.
+
+  ## Headers
+
+  - Accept (مطلوب): application/json.
+  - Accept-Language (اختياري): ar أو en لاسم القسم ورسالة الاستجابة.
+
+  ## Path parameter
+
+  - product (مطلوب): معرّف رقمي موجب لمنتج منشور في متجر وقسم نشطين.
+
+  ## Query parameters
+
+  - main_category_id (اختياري): معرّف قسم رئيسي نشط؛ تطبق قواعد قائمة المنتجات نفسها.
+  - sub_category_id (اختياري): معرّف قسم فرعي نشط؛ يجب أن يتبع main_category_id عند إرساله.
+  - governorate_id (اختياري): معرّف محافظة نشطة لموقع المتجر.
+  - search (اختياري): بحث جزئي باسم المنتج حتى 120 حرفًا.
+  - sort (اختياري): most_purchased للأكثر شراءً؛ وهو الافتراضي.
+  - sort (اختياري): highest_rated للأعلى تقييمًا، ويستبعد المنتجات بلا تقييم ظاهر.
+  - sort (اختياري): newest للمضاف حديثًا أولًا.
+  - pagination: القائمة مقسمة دائمًا إلى صفحات، وتقبل on.
+  - limit_per_page (اختياري): من 1 إلى 100؛ الافتراضي 10.
+  - page (اختياري): عدد صحيح يبدأ من 1؛ الافتراضي 1.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع data بنفس حقول طلب قائمة المنتجات، بالإضافة إلى current_page وlast_page وper_page وtotal.
+
+  مثال مختصر:
+
+  {"code":200,"message":"تم جلب المنتجات المشابهة بنجاح.","data":[{"id":2,"name":"قميص قطني","category_id":4,"price":"620.00","is_favorite":false}],"current_page":1,"last_page":2,"per_page":10,"total":12}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن.
+  HTTP 404 إذا كان المنتج المرجعي غير موجود أو غير منشور أو لا يتبع متجرًا وقسمًا نشطين.
+  HTTP 422 عند فساد المعرّفات أو sort أو page أو limit_per_page، برسائل عربية وإنجليزية.

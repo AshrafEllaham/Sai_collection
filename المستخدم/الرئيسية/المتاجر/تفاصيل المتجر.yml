@@ -1,0 +1,113 @@
+info:
+  name: تفاصيل المتجر
+  type: http
+  seq: 13
+
+http:
+  method: GET
+  url: "{{user_ur}}/stores/1?lat=30.0444&long=31.2357"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  params:
+    - name: store
+      value: "1"
+      type: path
+      description: مطلوب. معرّف رقمي موجب لمتجر نشط تابع لقسم نشط.
+    - name: lat
+      value: "30.0444"
+      type: query
+      description: اختياري مع long. خط العرض من -90 إلى 90 لحساب المسافة من موقع المستخدم.
+    - name: long
+      value: "31.2357"
+      type: query
+      description: اختياري مع lat. خط الطول من -180 إلى 180؛ يجب إرسال الإحداثيين معًا.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يعرض بيانات متجر نشط كما تظهر في شاشة تفاصيل المتجر، مع سياساته الحالية وأحدث المنتجات المتاحة.
+
+  ## عنوان الطلب
+
+  GET {{user_ur}}/stores/{store}
+
+  قيمة user_ur في المجموعة: http://127.0.0.1:8000/api/user
+
+  استبدل 1 في المسار بمعرّف المتجر المطلوب.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لمستخدم مسجل الدخول، ويرثه الطلب من إعدادات المجموعة.
+
+  ## Headers
+
+  - Accept (مطلوب): application/json.
+
+  - Accept-Language (اختياري): ar أو en لترجمة أسماء القسم والمحافظة والمدينة ورسالة الاستجابة.
+
+  ## Path parameter
+
+  - store (مطلوب): معرّف رقمي موجب لمتجر نشط تابع لقسم نشط.
+
+  ## Query parameters
+
+  - lat (اختياري): خط العرض من -90 إلى 90. يجب إرساله مع long لحساب المسافة.
+
+  - long (اختياري): خط الطول من -180 إلى 180. يجب إرساله مع lat لحساب المسافة.
+
+  ## Body
+
+  لا يوجد body لهذا الطلب.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع كائن data يحتوي على بيانات المتجر.
+
+  - id وowner_id: معرّف سجل المتجر ومعرّف حساب مالك المتجر.
+
+  - name وimage وcover وdescription: الاسم والصورة الشخصية والغلاف والوصف.
+
+  - category_id وcategory_name: معرّف القسم واسمه بلغة الطلب.
+
+  - phone_code وphone: كود الدولة ورقم اتصال المتجر.
+
+  - governorate_id وgovernorate_name وcity_id وcity_name: بيانات المحافظة والمدينة.
+
+  - address: العنوان التفصيلي الذي أدخله صاحب المتجر.
+
+  - latitude وlongitude: إحداثيات المتجر، وقد تكون null.
+
+  - distance_km: المسافة بالكيلومتر عند إرسال إحداثيي المستخدم، وإلا تكون null.
+
+  - average_rating وreviews_count: متوسط وعدد تقييمات المتجر الظاهرة فقط.
+
+  - products_count: عدد المنتجات المنشورة والمتاحة في المخزون.
+
+  - is_favorite: هل المتجر ضمن مفضلة المستخدم الحالي.
+
+  - policy: السياسة الحالية للاستلام والاسترجاع والاستبدال والإلغاء، أو null عند عدم وجود سياسة.
+
+  - products: حتى 6 منتجات منشورة ومتاحة، مرتبة بالأحدث، وبنفس حقول مورد المنتجات في الكتالوج.
+
+  مثال مختصر:
+
+  {"code":200,"message":"تم جلب تفاصيل المتجر بنجاح.","data":{"id":1,"owner_id":3,"name":"متجر سعي","category_name":"ملابس","governorate_name":"القاهرة","city_name":"مدينة نصر","average_rating":4.8,"reviews_count":15,"distance_km":1.24,"products_count":20,"is_favorite":false,"policy":{"pickup_hold_hours":24,"returns_enabled":true,"return_window_days":7},"products":[]}}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب Bearer token صالح.
+
+  HTTP 404 إذا لم يوجد المتجر أو كان المتجر أو القسم غير نشط.
+
+  HTTP 422 إذا كان store غير رقم موجب، أو أُرسل lat دون long أو العكس، أو خرج أي إحداثي عن نطاقه.

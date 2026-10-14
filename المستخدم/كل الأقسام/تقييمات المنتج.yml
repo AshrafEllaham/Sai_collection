@@ -1,0 +1,82 @@
+info:
+  name: تقييمات المنتج
+  type: http
+  seq: 8
+
+http:
+  method: GET
+  url: "{{user_ur}}/products/1/reviews?pagination=on&limit_per_page=10"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  params:
+    - name: rating
+      value: "5"
+      type: query
+      description: اختياري. تقييم صحيح من 1 إلى 5 لتصفية القائمة.
+      disabled: true
+    - name: pagination
+      value: on
+      type: query
+    - name: limit_per_page
+      value: "10"
+      type: query
+      description: اختياري. عدد التقييمات في الصفحة من 1 إلى 100؛ الافتراضي 10.
+    - name: product
+      value: "1"
+      type: path
+      description: مطلوب. معرّف رقمي موجب لمنتج منشور في متجر وقسم نشطين.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يعرض التقييمات الظاهرة فقط لمنتج متاح، مع ملخص عام ومتغيرات تقسيم الصفحات.
+
+  ## عنوان الطلب
+
+  GET {{user_ur}}/products/{product}/reviews
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لمستخدم مسجل الدخول؛ يرثه الطلب من المجموعة.
+
+  ## Headers
+
+  - Accept (مطلوب): application/json.
+  - Accept-Language (اختياري): ar أو en لرسالة الاستجابة.
+
+  ## Path parameter
+
+  - product (مطلوب): معرّف رقمي موجب لمنتج منشور في متجر وقسم نشطين.
+
+  ## Query parameters
+
+  - rating (اختياري): عدد صحيح من 1 إلى 5 لتصفية القائمة فقط؛ الملخص يبقى لجميع التقييمات الظاهرة.
+  - limit_per_page (اختياري): من 1 إلى 100؛ الافتراضي 10.
+  - page (اختياري): عدد صحيح يبدأ من 1؛ الافتراضي 1.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع data لكل تقييم: id وrating وcomment وcreated_at وuser يحتوي id وname.
+  summary يحتوي average_rating وreviews_count لكل التقييمات الظاهرة للمنتج.
+  current_page وlast_page وper_page وtotal تخص القائمة بعد فلتر rating.
+
+  مثال مختصر:
+
+  {"code":200,"message":"تم جلب تقييمات المنتج بنجاح.","summary":{"average_rating":4.5,"reviews_count":12},"data":[{"id":7,"rating":5,"comment":"جودة ممتازة","user":{"id":4,"name":"أحمد"}}],"current_page":1,"last_page":2,"per_page":10,"total":12}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن.
+  HTTP 404 إذا كان المنتج غير موجود أو غير منشور أو لا يتبع متجرًا وقسمًا نشطين.
+  HTTP 422 عند إرسال rating خارج 1–5 أو page أو limit_per_page غير صالحين؛ رسائل التحقق متاحة بالعربية والإنجليزية.

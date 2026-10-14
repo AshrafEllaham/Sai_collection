@@ -1,0 +1,108 @@
+info:
+  name: قائمة منتجات المتجر
+  type: http
+  seq: 14
+
+http:
+  method: GET
+  url: "{{user_ur}}/stores/1/products?search=قميص&sort=high_rate&pagination=on&limit_per_page=6&page=1"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  params:
+    - name: store
+      value: "1"
+      type: path
+      description: مطلوب. معرّف سجل المتجر الرقمي، وليس معرّف صاحب المتجر.
+    - name: search
+      value: قميص
+      type: query
+      description: اختياري. بحث جزئي باسم المنتج، حتى 120 حرفًا.
+    - name: sort
+      value: high_rate
+      type: query
+      description: اختياري. high_rate للأعلى تقييمًا، newest للأحدث، أو most_purchased للأكثر شراءً؛ الافتراضي most_purchased.
+    - name: pagination
+      value: on
+      type: query
+      description: يفعّل تقسيم النتائج إلى صفحات؛ الرابط يعيد pagination=on دائمًا.
+    - name: limit_per_page
+      value: "6"
+      type: query
+      description: اختياري. عدد المنتجات في الصفحة من 1 إلى 100؛ الافتراضي 10.
+    - name: page
+      value: "1"
+      type: query
+      description: اختياري. رقم الصفحة ويبدأ من 1؛ الافتراضي 1.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يعرض المنتجات المنشورة والمتاحة التابعة لمتجر محدد، مع البحث والترتيب وتقسيم النتائج إلى صفحات.
+
+  ## عنوان الطلب
+
+  GET {{user_ur}}/stores/{store}/products
+
+  قيمة user_ur في المجموعة: http://127.0.0.1:8000/api/user
+
+  استبدل 1 في المسار بمعرّف سجل المتجر.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لمستخدم مسجل الدخول، ويرثه الطلب من إعدادات المجموعة.
+
+  ## Headers
+
+  - Accept (مطلوب): application/json.
+
+  - Accept-Language (اختياري): ar أو en لاختيار لغة رسالة الاستجابة وأسماء التصنيفات.
+
+  ## Path parameter
+
+  - store (مطلوب): معرّف سجل المتجر الرقمي. لا ترسل معرّف حساب مالك المتجر.
+
+  ## Query parameters
+
+  - search (اختياري): بحث جزئي داخل اسم المنتج، بحد أقصى 120 حرفًا.
+
+  - sort (اختياري): ترتيب النتائج. القيم المسموحة:
+    - high_rate: الأعلى متوسطًا في التقييمات الظاهرة. المنتجات بلا تقييم ظاهر لا تظهر بهذا الترتيب.
+    - newest: المضاف حديثًا حسب created_at تنازليًا، ثم id تنازليًا عند تساوي التاريخ.
+    - most_purchased: الأكثر مبيعًا بحسب وحدات الطلبات المكتملة؛ وهو الترتيب الافتراضي.
+
+  - pagination: يفعّل تقسيم النتائج إلى صفحات، ويكون on دائمًا لهذا الرابط.
+
+  - limit_per_page (اختياري): عدد المنتجات في الصفحة من 1 إلى 100؛ الافتراضي 10.
+
+  - page (اختياري): رقم الصفحة، عدد صحيح يبدأ من 1؛ الافتراضي 1.
+
+  ## Body
+
+  لا يوجد body لهذا الطلب.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع قائمة data وبيانات الصفحة. كل منتج يعرض id وcategory_id وcategory_name وname وprice وoriginal_price وdiscount_percentage وimage وis_favorite وaverage_rating وreviews_count وunits_sold.
+
+  مثال:
+
+  {"code":200,"message":"تم جلب منتجات المتجر بنجاح.","data":[{"id":12,"category_id":2,"category_name":"ملابس رجالية","name":"قميص قطني","price":"620.00","original_price":null,"discount_percentage":null,"image":"https://example.test/storage/products/shirt.jpg","is_favorite":false,"average_rating":4.7,"reviews_count":18,"units_sold":187}],"current_page":1,"last_page":3,"per_page":6,"total":14}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب Bearer token صالح.
+
+  HTTP 404 إذا لم يوجد المتجر، أو لم يكن المتجر نشطًا، أو كان قسمه غير نشط.
+
+  HTTP 422 إذا كان sort خارج القيم المذكورة، أو كان search أطول من 120 حرفًا، أو كان page أقل من 1، أو كان limit_per_page خارج 1 إلى 100.

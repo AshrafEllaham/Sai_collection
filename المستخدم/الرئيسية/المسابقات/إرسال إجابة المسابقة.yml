@@ -1,0 +1,103 @@
+info:
+  name: إرسال إجابة المسابقة
+  type: http
+  seq: 4
+
+http:
+  method: PUT
+  url: "{{user_ur}}/competitions/1/entry"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+    - name: Content-Type
+      value: application/json
+  params:
+    - name: competition
+      value: "1"
+      type: path
+      description: مطلوب. معرّف رقمي موجب لمسابقة ظاهرة ومفتوحة.
+  body:
+    type: json
+    data: |-
+      {
+        "answer": "القمصان القطنية"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يسجل إجابة المستخدم للمسابقة أو يحدث الإجابة نفسها إذا سبق له المشاركة.
+
+  يمكن تعديل الإجابة حتى موعد انتهاء المسابقة، ثم تُغلق المشاركة عند انتهاء الوقت أو إجراء السحب.
+
+  ## عنوان الطلب
+
+  PUT {{user_ur}}/competitions/{competition}/entry
+
+  قيمة user_ur في المجموعة: http://127.0.0.1:8000/api/user
+
+  استبدل 1 في المسار بمعرّف المسابقة المطلوب.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب مستخدم شخصي نشط، ويرثه الطلب من إعدادات المجموعة.
+
+  ## Headers
+
+  - Accept (مطلوب): application/json.
+
+  - Content-Type (مطلوب): application/json.
+
+  - Accept-Language (اختياري): ar أو en للرسالة وأخطاء التحقق.
+
+  ## Path parameter
+
+  - competition (مطلوب): معرّف رقمي موجب لمسابقة ظاهرة من متجر نشط وتصنيف نشط.
+
+  ## Body
+
+  - answer (مطلوب): نص من 3 إلى 180 حرفًا، ولا يجوز أن يتكوّن من مسافات أو تشكيل فقط.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع المشاركة المسجلة داخل data.
+
+  - id: معرّف المشاركة.
+
+  - answer: الإجابة بعد إزالة المسافات من بدايتها ونهايتها.
+
+  - created_at: وقت إنشاء المشاركة.
+
+  - updated_at: وقت آخر تعديل للإجابة.
+
+  مثال:
+
+  {"code":200,"message":"تم حفظ إجابتك في المسابقة بنجاح.","data":{"id":8,"answer":"القمصان القطنية","created_at":"2026-10-13 10:00 AM","updated_at":"2026-10-13 10:00 AM"}}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب Bearer token صالح.
+
+  HTTP 404 إذا كان معرّف المسابقة غير رقمي أو لم توجد المسابقة.
+
+  HTTP 404 إذا كانت المسابقة ملغاة أو لم يعد متجرها أو تصنيفها نشطًا.
+
+  HTTP 422 إذا كان answer فارغًا أو أقل من 3 أحرف أو أطول من 180 حرفًا.
+
+  HTTP 422 إذا تكوّن answer من مسافات وتشكيل فقط، أو انتهت المشاركة، أو تم السحب.
+
+  HTTP 422 إذا كان الحساب من نوع متجر بدل حساب مستخدم شخصي.
+
+  مثال خطأ تحقق:
+
+  {"code":422,"message":"إجابة المسابقة يجب ألا تقل عن 3 أحرف."}

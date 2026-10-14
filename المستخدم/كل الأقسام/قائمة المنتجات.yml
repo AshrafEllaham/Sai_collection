@@ -1,11 +1,11 @@
 info:
-  name: قائمة المنتجات حسب القسم
+  name: قائمة المنتجات
   type: http
   seq: 3
 
 http:
   method: GET
-  url: "{{user_ur}}/products?main_category_id=1&sub_category_id=2&search=قميص&pagination=on&limit_per_page=4"
+  url: "{{user_ur}}/products?main_category_id=1&sub_category_id=2&search=قميص&governorate_id=1&sort=newest&pagination=on&limit_per_page=4"
   headers:
     - name: Accept
       value: application/json
@@ -24,11 +24,14 @@ http:
       value: قميص
       type: query
       description: اختياري. بحث جزئي باسم المنتج، حتى 120 حرفًا.
-    - name: sort
-      value: most_purchased
+    - name: governorate_id
+      value: "1"
       type: query
-      description: اختياري. most_purchased للأكثر شراءً أو highest_rated للأعلى تقييمًا؛ الافتراضي most_purchased.
-      disabled: true
+      description: اختياري. معرّف محافظة نشطة؛ يعرض منتجات المتاجر المسجلة فيها فقط.
+    - name: sort
+      value: newest
+      type: query
+      description: اختياري. most_purchased للأكثر شراءً، highest_rated للأعلى تقييمًا، newest للمضاف حديثًا؛ الافتراضي most_purchased.
     - name: pagination
       value: on
       type: query
@@ -37,6 +40,11 @@ http:
       value: "4"
       type: query
       description: اختياري. عدد المنتجات في الصفحة من 1 إلى 100؛ الافتراضي 10.
+    - name: page
+      value: "1"
+      type: query
+      description: اختياري. رقم الصفحة يبدأ من 1؛ الافتراضي 1.
+      disabled: true
   auth: inherit
 
 settings:
@@ -71,9 +79,11 @@ docs: |-
   - main_category_id (اختياري): معرّف قسم رئيسي نشط؛ يعيد منتجاته ومنتجات الأقسام الفرعية التابعة له.
   - sub_category_id (اختياري): معرّف قسم فرعي نشط. إذا أرسلت main_category_id، يجب أن يكون هذا القسم الفرعي تابعًا له.
   - search (اختياري): بحث جزئي داخل اسم المنتج، بحد أقصى 120 حرفًا.
+  - governorate_id (اختياري): معرّف محافظة نشطة. تظهر منتجات المتاجر التي تقع في هذه المحافظة فقط.
   - sort (اختياري): ترتيب النتائج. القيم المسموحة:
     - most_purchased: مجموع وحدات المنتجات في الطلبات المكتملة، من الأعلى إلى الأقل. وهو الترتيب الافتراضي.
     - highest_rated: متوسط التقييمات الظاهرة من الأعلى إلى الأقل؛ لا تظهر المنتجات بلا تقييم ظاهر في هذا الترتيب.
+    - newest: أحدث المنتجات إضافة بحسب created_at تنازليًا، ثم id تنازليًا عند تساوي التاريخ.
   - pagination (اختياري): on لتقسيم النتائج إلى صفحات أو off لإرجاع القائمة كاملة؛ الافتراضي off.
   - limit_per_page (اختياري): عدد النتائج من 1 إلى 100 عند استخدام pagination=on؛ الافتراضي 10.
   - page (اختياري): رقم الصفحة، عدد صحيح يبدأ من 1؛ الافتراضي 1.
@@ -89,6 +99,6 @@ docs: |-
 
   ## أخطاء التحقق
 
-  HTTP 422 إذا كان sort خارج القيم المذكورة، أو كانت معرّفات الأقسام غير صحيحة أو غير نشطة، أو كان القسم الفرعي لا يتبع القسم الرئيسي، أو تجاوز search حد 120 حرفًا.
+  HTTP 422 إذا كان sort خارج القيم المذكورة، أو كانت معرّفات الأقسام غير صحيحة أو غير نشطة، أو كان القسم الفرعي لا يتبع القسم الرئيسي، أو كانت المحافظة غير موجودة أو غير نشطة، أو تجاوز search حد 120 حرفًا.
 
   مثال: {"code":422,"message":"القسم الفرعي النشط المحدد غير موجود أو لا يتبع القسم الرئيسي المحدد."}

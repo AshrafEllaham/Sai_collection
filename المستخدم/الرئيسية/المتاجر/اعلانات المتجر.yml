@@ -1,0 +1,104 @@
+info:
+  name: اعلانات المتجر
+  type: http
+  seq: 15
+
+http:
+  method: GET
+  url: "{{user_ur}}/stores/1/ads?pagination=on&limit_per_page=6&page=1"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  params:
+    - name: store
+      value: "1"
+      type: path
+      description: مطلوب. معرّف رقمي موجب لسجل المتجر، وليس معرّف حساب مالك المتجر.
+    - name: pagination
+      value: on
+      type: query
+      description: مفعّل دائمًا لهذا الرابط لتقسيم إعلانات المتجر إلى صفحات.
+    - name: limit_per_page
+      value: "6"
+      type: query
+      description: اختياري. عدد الإعلانات في الصفحة من 1 إلى 100؛ الافتراضي 10.
+    - name: page
+      value: "1"
+      type: query
+      description: اختياري. رقم الصفحة ويبدأ من 1؛ الافتراضي 1.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يعرض الإعلانات التي حالتها نشطة وموعد بدايتها قد حل وموعد انتهائها لم يمر، لمتجر محدد.
+  تكون النتائج مرتبة من الأحدث إلى الأقدم ومقسمة إلى صفحات.
+
+  ## عنوان الطلب
+
+  GET {{user_ur}}/stores/{store}/ads
+
+  قيمة user_ur في المجموعة: http://127.0.0.1:8000/api/user
+
+  استبدل 1 في المسار بمعرّف سجل المتجر.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لمستخدم مسجل الدخول، ويرثه الطلب من إعدادات المجموعة.
+
+  ## Headers
+
+  - Accept (مطلوب): application/json.
+
+  - Accept-Language (اختياري): ar أو en لاختيار لغة رسالة الاستجابة.
+
+  ## Path parameter
+
+  - store (مطلوب): معرّف رقمي موجب لسجل المتجر. لا ترسل معرّف حساب مالك المتجر.
+  - لا يعرض الرابط إعلانات متجر غير نشط أو متجر يتبع قسمًا غير نشط.
+
+  ## Query parameters
+
+  - pagination: يرسل on دائمًا؛ هذا الرابط يعيد النتائج مقسمة إلى صفحات.
+
+  - limit_per_page (اختياري): عدد الإعلانات في الصفحة من 1 إلى 100؛ الافتراضي 10.
+
+  - page (اختياري): رقم الصفحة كعدد صحيح يبدأ من 1؛ الافتراضي 1.
+
+  ## Body
+
+  لا يوجد body لهذا الطلب.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع قائمة data وبيانات الصفحة.
+
+  - id وpublic_id: معرّفا الإعلان.
+  - product_id وcategory_id: العنصر أو القسم المرتبط بالإعلان، وقد تكون القيمة null.
+  - title وaction_label وcaption: عنوان الإعلان ونص الإجراء والوصف، وقد يكون action_label أو caption فارغًا.
+  - placement: موضع الإعلان؛ القيم home للرئيسية، category للقسم، storefront لواجهة المتجر.
+  - action: الإجراء؛ view_product لعرض المنتج، view_store لعرض المتجر، start_chat لبدء محادثة، buy_now للشراء.
+  - media_type: نوع الوسيط؛ image صورة، video فيديو، file ملف.
+  - media_path: رابط الوسيط.
+  - starts_at وends_at: بداية الإعلان ونهايته، وقد تكون أي منهما null.
+
+  مثال:
+
+  {"code":200,"message":"تم جلب إعلانات المتجر النشطة بنجاح.","data":[{"id":12,"public_id":"c8467125-57ac-4b5e-9c1c-2b10d21f4cb1","product_id":7,"category_id":null,"title":"تشكيلة جديدة","action_label":"تسوق الآن","caption":"اكتشف أحدث المنتجات","placement":"storefront","action":"buy_now","media_type":"image","media_path":"https://example.test/storage/ads/new-collection.jpg","starts_at":null,"ends_at":"2026-10-20 12:00 PM"}],"current_page":1,"last_page":2,"per_page":6,"total":8}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب Bearer token صالح.
+
+  HTTP 404 إذا لم يوجد المتجر أو لم يكن المتجر وقسمه نشطين.
+
+  HTTP 422 إذا كان store غير رقم موجب، أو كان page أقل من 1، أو كانت limit_per_page خارج 1 إلى 100.

@@ -1,0 +1,86 @@
+info:
+  name: تفاصيل المنتج
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: "{{user_ur}}/products/1"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  params:
+    - name: product
+      value: "1"
+      type: path
+      description: مطلوب. معرّف رقمي موجب لمنتج منشور تابع لمتجر نشط.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يعرض تفاصيل منتج منشور من متجر نشط كما تظهر في شاشة تفاصيل المنتج للمستخدم.
+
+  ## عنوان الطلب
+
+  GET {{user_ur}}/products/{product}
+
+  استبدل 1 في عنوان الطلب بمعرّف المنتج المطلوب.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لمستخدم مسجل الدخول، ويرثه الطلب من إعدادات المجموعة.
+
+  ## Headers
+
+  - Accept (مطلوب): application/json.
+  - Accept-Language (اختياري): ar أو en لترجمة اسم القسم ورسالة الاستجابة.
+
+  ## Path parameter
+
+  - product (مطلوب): معرّف رقمي موجب لمنتج منشور. يجب أن يكون المتجر نشطًا والقسم نشطًا.
+
+  ## Body
+
+  لا يوجد body لهذا الطلب.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع data التي تضم id وname وdescription وprice وoriginal_price وdiscount_percentage وstock_quantity وcreated_at وis_favorite.
+
+  media: صور المنتج وروابطها ونوعها وحالة الصورة الرئيسية.
+
+  features: قائمة مميزات المنتج.
+
+  category_name: اسم القسم بلغة الطلب.
+
+  store: معرّف المتجر واسمه وصورته ورقم هاتفه ومعرّف محافظته.
+
+  policy: سياسة الاستلام والاسترجاع والاستبدال والإلغاء الحالية للمتجر؛ قد تكون null إذا لم تُضبط سياسة حالية.
+
+  average_rating وreviews_count: متوسط وعدد التقييمات الظاهرة فقط.
+
+  latest_review: أحدث تقييم ظاهر مع اسم صاحبه، أو null عند عدم وجود تقييمات.
+
+  similar_products: حتى 4 منتجات منشورة ومتاحة من القسم نفسه، باستثناء المنتج الحالي.
+
+  مثال مختصر:
+
+  {"code":200,"message":"تم جلب تفاصيل المنتج بنجاح.","data":{"id":1,"name":"جاكيت جلد طبيعي","price":"2890.00","stock_quantity":3,"features":["جلد طبيعي"],"media":[{"type":"image","url":"https://example.test/storage/products/jacket.jpg","is_primary":true}],"store":{"id":3,"name":"نقطة ستور"},"policy":{"pickup_hold_hours":24,"returns_enabled":true,"return_window_days":7},"average_rating":5,"reviews_count":1,"latest_review":{"rating":5,"comment":"ممتاز"},"similar_products":[]}}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 404 عند عدم وجود المنتج، أو كونه غير منشور، أو عدم نشاط المتجر أو القسم.
+
+  HTTP 422 إذا كان product صفرًا؛ رسالة التحقق متاحة بالعربية والإنجليزية.

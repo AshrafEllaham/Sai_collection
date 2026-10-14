@@ -1,0 +1,101 @@
+info:
+  name: تفاصيل المسابقة
+  type: http
+  seq: 3
+
+http:
+  method: GET
+  url: "{{user_ur}}/competitions/1"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  params:
+    - name: competition
+      value: "1"
+      type: path
+      description: مطلوب. معرّف رقمي موجب لمسابقة ظاهرة من متجر نشط وتصنيف نشط.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يعرض تفاصيل مسابقة متجر وإجابة المستخدم الحالي، ويعرض اسم الفائز بعد إعلان نتيجة السحب.
+
+  ## عنوان الطلب
+
+  GET {{user_ur}}/competitions/{competition}
+
+  قيمة user_ur في المجموعة: http://127.0.0.1:8000/api/user
+
+  استبدل 1 في المسار بمعرّف المسابقة المطلوب.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لمستخدم مسجل الدخول، ويرثه الطلب من إعدادات المجموعة.
+
+  ## Headers
+
+  - Accept (مطلوب): application/json.
+
+  - Accept-Language (اختياري): ar أو en للرسالة وأخطاء الطلب.
+
+  ## Path parameter
+
+  - competition (مطلوب): معرّف رقمي موجب لمسابقة ظاهرة من متجر نشط وتصنيف نشط.
+
+  ## Body
+
+  لا يوجد body لهذا الطلب.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع كائن المسابقة داخل data.
+
+  - id: معرّف المسابقة الرقمي.
+
+  - public_id: المعرّف العام للمسابقة.
+
+  - title: عنوان المسابقة.
+
+  - question: سؤال المسابقة.
+
+  - prize: وصف الجائزة.
+
+  - image: رابط صورة المسابقة، أو null.
+
+  - status: available_now للمسابقة المفتوحة، أو ended للمسابقة المنتهية أو المسحوب على جائزتها.
+
+  - ends_at: موعد انتهاء المشاركة.
+
+  - drawn_at: وقت السحب، أو null قبل السحب.
+
+  - participants_count: عدد المشاركات المسجلة.
+
+  - store: معرّف المتجر واسمه وصورته عند توفرهما.
+
+  - my_entry: إجابة المستخدم الحالي ووقت حفظها، أو null إذا لم يشارك.
+
+  - winner: اسم الفائز بعد السحب، أو null قبله.
+
+  مثال:
+
+  {"code":200,"message":"تم جلب تفاصيل المسابقة بنجاح.","data":{"id":1,"public_id":"9f8c2ad5-0e89-42c6-9ab2-1b8fb46cc400","title":"اكسب قسيمة تسوق","question":"ما هي القطعة التي تفضلها؟","prize":"قسيمة بقيمة ١٬٠٠٠ ج.م","image":"https://example.test/storage/competitions/1.jpg","status":"available_now","ends_at":"2026-10-30 09:00 AM","drawn_at":null,"participants_count":4,"store":{"id":3,"name":"أزياء الشرق","image":"https://example.test/storage/stores/3.jpg"},"my_entry":{"id":8,"answer":"القمصان القطنية","created_at":"2026-10-13 10:00 AM","updated_at":"2026-10-13 10:00 AM"},"winner":null}}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب Bearer token صالح.
+
+  HTTP 404 إذا كان معرّف المسابقة غير رقمي أو لم توجد المسابقة.
+
+  HTTP 404 إذا كانت المسابقة ملغاة.
+
+  HTTP 404 إذا لم يعد متجرها أو تصنيفها نشطًا.

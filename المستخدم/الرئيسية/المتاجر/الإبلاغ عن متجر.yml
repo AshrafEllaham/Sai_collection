@@ -1,0 +1,79 @@
+info:
+  name: الإبلاغ عن متجر
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{user_ur}}/stores/1/reports"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+    - name: Content-Type
+      value: application/json
+  params:
+    - name: store
+      value: "1"
+      type: path
+      description: مطلوب. معرّف رقمي موجب لمتجر نشط تابع لحساب متجر نشط وتصنيف نشط.
+  body:
+    type: json
+    data: |-
+      {
+        "report_reason_id": 4
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يسجل بلاغ المستخدم عن متجر بسبب محدد من أسباب الإبلاغ الخاصة بالمتاجر.
+
+  إعادة إرسال المتجر والسبب نفسيهما تعيد البلاغ الموجود دون إنشاء سجل مكرر.
+
+  ## عنوان الطلب
+
+  POST {{user_ur}}/stores/{store}/reports
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا، ويرثه الطلب من المجموعة.
+
+  ## Headers
+
+  - Accept (مطلوب): application/json.
+
+  - Content-Type (مطلوب): application/json.
+
+  - Accept-Language (اختياري): ar أو en للرسالة وأخطاء التحقق.
+
+  ## Path parameter
+
+  - store (مطلوب): معرّف رقمي أكبر من صفر لمتجر متاح، مالكه نشط وتصنيفه نشط.
+
+  ## Body
+
+  - report_reason_id (مطلوب): عدد صحيح يطابق id من GET /report-reasons?type=store.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع id للبلاغ وtype=store وitem_id وreport_reason_id.
+
+  مثال: {"code":200,"message":"تم إرسال البلاغ بنجاح.","data":{"id":1,"type":"store","item_id":1,"report_reason_id":4}}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن أو عدم صلاحيته.
+
+  HTTP 404 إذا كان المتجر غير موجود أو مالكه أو تصنيفه غير نشط.
+
+  HTTP 422 إذا غاب report_reason_id أو لم يكن عددًا صحيحًا أو لم يطابق سبب متجر موجودًا.

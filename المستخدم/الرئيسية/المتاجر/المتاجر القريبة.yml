@@ -1,0 +1,130 @@
+info:
+  name: المتاجر القريبة
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{user_ur}}/stores/nearby?main_category_id=3&governorate_id=1&search=متجر&sort=nearest&lat=30.0444&long=31.2357&pagination=on&limit_per_page=6&page=1"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  params:
+    - name: main_category_id
+      value: "3"
+      type: query
+      description: اختياري. معرّف قسم رئيسي نشط؛ يفلتر المتاجر التابعة لهذا القسم.
+    - name: governorate_id
+      value: "1"
+      type: query
+      description: اختياري. معرّف محافظة نشطة؛ يفلتر حسب محافظة صاحب المتجر.
+    - name: search
+      value: متجر
+      type: query
+      description: اختياري. يبحث داخل اسم المتجر، بحد أقصى 120 حرفًا.
+    - name: sort
+      value: nearest
+      type: query
+      description: "اختياري. إحدى القيم: high_rate أو nearest أو newest. nearest يتطلب lat وlong."
+    - name: lat
+      value: "30.0444"
+      type: query
+      description: اختياري مع long. خط العرض من -90 إلى 90؛ عند إرسالهما ترتب المتاجر حسب الأقرب.
+    - name: long
+      value: "31.2357"
+      type: query
+      description: اختياري مع lat. خط الطول من -180 إلى 180؛ يجب إرسال الإحداثيين معًا.
+    - name: pagination
+      value: on
+      type: query
+    - name: limit_per_page
+      value: "6"
+      type: query
+      description: اختياري. عدد المتاجر في الصفحة من 1 إلى 100؛ الافتراضي 10.
+    - name: page
+      value: "1"
+      type: query
+      description: اختياري. رقم الصفحة ويبدأ من 1.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يعرض المتاجر النشطة في قائمة مقسمة إلى صفحات.
+
+  يدعم الفلترة بالقسم الرئيسي والمحافظة والبحث في اسم المتجر، مع ترتيب حسب التقييم أو المسافة أو الأحدث.
+
+  عند إغفال sort، يستخدم الأقرب إذا أُرسلت الإحداثيات، والأعلى تقييمًا إذا لم تُرسل.
+
+  قيمة nearest تتطلب إرسال lat وlong معًا، وتستبعد المتاجر التي لم تُحفظ لها إحداثيات.
+
+  إذا لم يُرسل sort، يستخدم الأقرب عند وجود الإحداثيين، والأعلى تقييمًا عند غيابهما.
+
+  ## عنوان الطلب
+
+  GET {{user_ur}}/stores/nearby
+
+  قيمة user_ur في المجموعة: http://127.0.0.1:8000/api/user
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لمستخدم مسجل الدخول، ويرثه الطلب من إعدادات المجموعة.
+
+  ## Headers
+
+  - Accept (مطلوب): application/json.
+
+  - Accept-Language (اختياري): ar أو en لاختيار ترجمة اسم التصنيف ورسالة الاستجابة.
+
+  ## Query parameters
+
+  - main_category_id (اختياري): معرّف قسم رئيسي نشط.
+
+  - governorate_id (اختياري): معرّف محافظة نشطة يطابق محافظة المتجر.
+
+  - search (اختياري): نص يبحث داخل اسم المتجر، بحد أقصى 120 حرفًا.
+
+  - sort (اختياري): ترتيب النتائج، والقيم المسموحة هي high_rate للأعلى تقييمًا، nearest للأقرب، newest للأحدث.
+
+  - lat (اختياري): خط العرض من -90 إلى 90. مطلوب عند اختيار sort=nearest، ويجب إرساله مع long.
+
+  - long (اختياري): خط الطول من -180 إلى 180. مطلوب عند اختيار sort=nearest، ويجب إرساله مع lat.
+
+  - limit_per_page (اختياري): عدد النتائج في الصفحة من 1 إلى 100؛ الافتراضي 10.
+
+  - page (اختياري): رقم الصفحة، عدد صحيح يبدأ من 1؛ الافتراضي 1.
+
+  تقسيم الصفحات مفعل دائمًا لهذا المسار.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع قائمة data ومعلومات current_page وlast_page وper_page وtotal.
+
+  كل متجر يعرض id وowner_id وname وimage وcover وcategory_id وcategory_name وaddress وis_favorite وaverage_rating وreviews_count وdistance_km.
+
+  تكون distance_km بالكيلومتر عند اختيار nearest، وتكون null مع high_rate أو newest.
+
+  مثال:
+
+  {"code":200,"message":"تم جلب المتاجر القريبة بنجاح.","data":[{"id":7,"owner_id":21,"name":"متجر سعي","image":null,"cover":null,"category_id":3,"category_name":"ملابس","address":"مدينة نصر","is_favorite":false,"average_rating":4.8,"reviews_count":15,"distance_km":1.24}],"current_page":1,"last_page":1,"per_page":6,"total":1}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب Bearer token صالح.
+
+  HTTP 422 إذا كان main_category_id أو governorate_id غير صحيح أو غير نشط.
+
+  HTTP 422 إذا تجاوز search عدد 120 حرفًا أو كانت قيمة sort خارج high_rate وnearest وnewest.
+
+  HTTP 422 عند اختيار nearest دون إحداثيين، أو إرسال lat دون long أو العكس، أو خروج أي إحداثي عن نطاقه.
+
+  HTTP 422 إذا كان limit_per_page خارج النطاق من 1 إلى 100 أو كان page أقل من 1 أو ليس عددًا صحيحًا.

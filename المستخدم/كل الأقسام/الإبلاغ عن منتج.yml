@@ -1,0 +1,77 @@
+info:
+  name: الإبلاغ عن منتج
+  type: http
+  seq: 10
+
+http:
+  method: POST
+  url: "{{user_ur}}/products/1/reports"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+    - name: Content-Type
+      value: application/json
+  params:
+    - name: product
+      value: "1"
+      type: path
+      description: مطلوب. معرّف رقمي موجب لمنتج منشور في متجر وقسم نشطين.
+  body:
+    type: json
+    data: |-
+      {
+        "report_reason_id": 1
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يسجل بلاغ المستخدم عن منتج بسبب محدد من قائمة أسباب الإبلاغ.
+
+  إعادة إرسال المنتج والسبب نفسيهما تعيد البلاغ الموجود دون تكراره.
+
+  ## عنوان الطلب
+
+  POST {{user_ur}}/products/{product}/reports
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا، ويرثه الطلب من المجموعة.
+
+  ## Headers
+
+  - Accept (مطلوب): application/json.
+  - Content-Type (مطلوب): application/json.
+  - Accept-Language (اختياري): ar أو en للرسالة وأخطاء التحقق.
+
+  ## Path parameter
+
+  - product (مطلوب): معرّف رقمي أكبر من صفر لمنتج متاح ومنشور.
+
+  ## Body
+
+  - report_reason_id (مطلوب): عدد صحيح يطابق id من GET /report-reasons?type=product.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع id للبلاغ وtype=product وitem_id وreport_reason_id.
+
+  مثال: {"code":200,"message":"تم إرسال البلاغ بنجاح.","data":{"id":1,"type":"product","item_id":1,"report_reason_id":1}}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب التوكن.
+
+  HTTP 404 إذا كان المنتج غير موجود أو غير متاح.
+
+  HTTP 422 إذا غاب report_reason_id أو لم يكن عددًا صحيحًا أو لم يطابق سبب منتج موجودًا.
