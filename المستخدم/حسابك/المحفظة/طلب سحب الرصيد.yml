@@ -1,0 +1,107 @@
+info:
+  name: طلب سحب الرصيد
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{user_ur}}/wallet/withdrawal-requests"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  body:
+    type: multipart-form
+    data:
+      - name: amount
+        type: text
+        value: "250.00"
+        description: مطلوب. أكبر من صفر وبمنزلتين عشريتين كحد أقصى، ولا يتجاوز الرصيد المتاح.
+      - name: method
+        type: text
+        value: bank_account
+        description: "مطلوب. إحدى قيم PayoutMethodEnum: bank_account للحساب البنكي أو mobile_wallet لمحفظة الهاتف."
+      - name: destination
+        type: text
+        value: "1234567890123456"
+        description: مطلوب. بيانات الحساب أو المحفظة المستلمة، بحد أقصى 255 حرفًا.
+      - name: idempotency_key
+        type: text
+        value: 1c534d43-6f14-43cb-bbfd-06193dcc78fd
+        description: مطلوب. UUID فريد للطلب؛ استخدم المفتاح نفسه والبيانات نفسها عند إعادة المحاولة.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يرسل طلبًا لسحب مبلغ من محفظة الحساب الحالي، سواء كان حساب مستخدم أو متجر، للمراجعة من الإدارة.
+
+  لا يُخصم المبلغ عند الإرسال. يُخصم من الرصيد المتاح بعد اعتماد الإدارة فقط.
+
+  لا يمكن إرسال طلب سحب آخر بينما يوجد طلب لهذا الحساب حالته pending.
+
+  ## عنوان الطلب
+
+  POST {{general_url}}/wallet/withdrawal-requests
+
+  يستخدم الطلب متغير المجموعة general_url وقيمته الحالية http://127.0.0.1:8000/api.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب مسجل، ويرثه من إعدادات المجموعة.
+
+  ## Headers
+
+  Accept (مطلوب): application/json.
+
+  Accept-Language (اختياري): ar أو en لتحديد لغة الرسالة وأخطاء التحقق.
+
+  Content-Type: يضيفه Bruno تلقائيًا بصيغة multipart/form-data مع boundary المناسب.
+
+  ## Path Parameters
+
+  لا يحتوي هذا المسار على معاملات path.
+
+  ## Query Parameters
+
+  لا يحتاج هذا الطلب إلى معاملات query.
+
+  ## Body (multipart-form)
+
+  amount (text، مطلوب): المبلغ بعملة المحفظة. يجب أن يكون أكبر من صفر، حتى منزلتين عشريتين، وألا يتجاوز الرصيد المتاح أو 999999999999.99. لا ترسل currency؛ يستخدم الخادم عملة المحفظة.
+
+  method (text، مطلوب): وسيلة استلام المبلغ. القيم المسموحة من PayoutMethodEnum هي bank_account للحساب البنكي وmobile_wallet لمحفظة الهاتف.
+
+  destination (text، مطلوب): رقم الحساب البنكي أو بيانات محفظة الهاتف، بحد أقصى 255 حرفًا.
+
+  idempotency_key (UUID، مطلوب): مفتاح فريد للطلب. أعد استخدام المفتاح والبيانات نفسها عند إعادة محاولة الطلب شبكيًا؛ سيعيد الخادم الطلب نفسه. ابدأ طلبًا جديدًا بمفتاح UUID جديد بعد إغلاق الطلب السابق.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع id عام للطلب، وmethod، وdestination، وamount، وcurrency، وstatus، وreview_note، وcreated_at.
+
+  تكون الحالة الأولية pending. لا يتغير الرصيد المتاح حتى اعتماد الإدارة.
+
+  مثال: {"code":200,"data":{"id":"f318a994-8114-47ea-8ccb-d164c66d11bb","method":"bank_account","destination":"1234567890123456","amount":"250.00","currency":"EGP","status":"pending","review_note":null,"created_at":"2026-10-17T10:00:00+03:00"},"message":"تم إرسال طلب سحب الرصيد للمراجعة."}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب Bearer token أو عدم صلاحيته.
+
+  HTTP 422 إذا كان amount مفقودًا أو غير رقمي أو لا يتجاوز صفرًا أو يحتوي أكثر من منزلتين عشريتين أو يتجاوز الرصيد المتاح.
+
+  HTTP 422 إذا كان method مفقودًا أو لا يساوي bank_account أو mobile_wallet.
+
+  HTTP 422 إذا كان destination مفقودًا أو أطول من 255 حرفًا.
+
+  HTTP 422 إذا لم يكن idempotency_key بصيغة UUID صالحة أو استُخدم مع بيانات سحب مختلفة.
+
+  HTTP 422 إذا كان للحساب طلب سحب آخر حالته pending؛ انتظر قرار الإدارة قبل إرسال طلب جديد.

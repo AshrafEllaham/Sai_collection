@@ -16,7 +16,7 @@ http:
     data:
       - name: email
         type: text
-        value: store@gmail.com
+        value: user@gmail.com
         description: اختياري عند استخدام رقم الهاتف. أرسل البريد أو بيانات الهاتف فقط.
       - name: phone_code
         type: text

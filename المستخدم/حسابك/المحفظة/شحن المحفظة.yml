@@ -1,0 +1,83 @@
+info:
+  name: شحن المحفظة
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{user_ur}}/wallet"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  body:
+    type: multipart-form
+    data:
+      - name: amount
+        type: text
+        value: "250.00"
+        description: مطلوب. أكبر من صفر وبمنزلتين عشريتين كحد أقصى، والحد الأعلى 999999999999.99.
+      - name: idempotency_key
+        type: text
+        value: d4dbf65b-88a7-4dc8-8aa5-5f6b07b0bb38
+        description: مطلوب. UUID فريد للمحاولة؛ أعد استخدامه مع المبلغ نفسه عند إعادة المحاولة.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  ينشئ محاولة دفع إلكتروني لإضافة مبلغ إلى محفظة الحساب الحالي، سواء كان حساب مستخدم أو متجر.
+
+  بعد إنشاء المحاولة، افتح redirectUrl لإكمال الدفع. لا يُضاف المبلغ إلى الرصيد المتاح قبل تأكيد الدفع.
+
+  ## عنوان الطلب
+
+  POST {{general_url}}/wallet/top-up
+
+  يستخدم الطلب متغير المجموعة general_url وقيمته الحالية http://127.0.0.1:8000/api.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب مسجل، ويرثه من إعدادات المجموعة.
+
+  ## Headers
+
+  Accept (مطلوب): application/json.
+
+  Accept-Language (اختياري): ar أو en لتحديد لغة الرسائل وأخطاء التحقق.
+
+  Content-Type: يضيفه Bruno تلقائيًا بصيغة multipart/form-data مع boundary المناسب.
+
+  ## Body (multipart-form)
+
+  amount (text، مطلوب): المبلغ بعملة المحفظة. يجب أن يكون أكبر من صفر، ويقبل حتى منزلتين عشريتين، وحده الأعلى 999999999999.99. لا ترسل currency؛ يستخدم الخادم عملة المحفظة.
+
+  idempotency_key (string بصيغة UUID، مطلوب): مفتاح فريد للمحاولة. أعد استخدام المفتاح نفسه والمبلغ نفسه عند إعادة المحاولة الشبكية؛ سيرجع الخادم محاولة الدفع نفسها. استخدم مفتاحًا جديدًا عند بدء شحن جديد.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع payment_id وstatus وamount وcurrency وروابط متابعة الدفع.
+
+  redirectUrl يفتح صفحة الدفع.
+
+  paymentSuccess وpaymentFailed يحددان روابط نتيجة الدفع.
+
+  مثال: {"code":200,"data":{"payment_id":14,"status":"pending","amount":"250.00","currency":"EGP","redirectUrl":"https://example.test/pay-online/14/wallet_top_up","paymentSuccess":"https://example.test/payment-success/14/wallet_top_up","paymentFailed":"https://example.test/payment-failed/14/wallet_top_up"},"message":"تابع إلى صفحة الدفع لإتمام شحن المحفظة."}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب Bearer token أو عدم صلاحيته.
+
+  HTTP 422 إذا كان amount مفقودًا أو غير رقمي أو لا يتجاوز صفرًا أو يحتوي أكثر من منزلتين عشريتين أو يتجاوز الحد الأعلى.
+
+  HTTP 422 إذا كان idempotency_key مفقودًا أو لا يطابق UUID صالحًا.
+
+  HTTP 422 إذا استُخدم idempotency_key سابقًا مع مبلغ مختلف.

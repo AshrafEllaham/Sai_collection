@@ -1,0 +1,82 @@
+info:
+  name: تسجيل نقرة على إعلان
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{user_ur}}/ads/12/clicks"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  params:
+    - name: ad
+      value: "12"
+      type: path
+      description: مطلوب. المعرّف الرقمي للإعلان النشط الذي نقر عليه المستخدم.
+  body:
+    type: multipart-form
+    data:
+      - name: event_id
+        type: text
+        value: b19bb48e-f0cd-42ec-a303-64cf0a8198a3
+        description: مطلوب. UUID فريد لهذه النقرة؛ أعد استخدامه عند إعادة محاولة الحدث نفسه لمنع احتسابه مرتين.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يسجل نقرة المستخدم على الإعلان ويزيد عداد النقرات اليومية مرة واحدة فقط لمعرّف الحدث.
+
+  يرسل التطبيق الطلب قبل فتح وجهة الإعلان أو إجراء الزر.
+
+  ## عنوان الطلب
+
+  POST {{user_ur}}/ads/{ad}/clicks
+
+  قيمة user_ur في المجموعة: http://127.0.0.1:8000/api/user
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لمستخدم مسجل الدخول، ويرثه الطلب من إعدادات المجموعة.
+
+  ## Headers
+
+  Accept (مطلوب): application/json.
+
+  Accept-Language (اختياري): ar أو en لتحديد لغة الرسالة وأخطاء التحقق.
+
+  ## Path parameter
+
+  ad (مطلوب): المعرّف الرقمي للإعلان. يجب أن يكون الإعلان نشطًا وضمن موعد عرضه ومتجره نشطًا.
+
+  ## Body (multipart-form)
+
+  event_id (مطلوب): UUID فريد لحدث النقرة. استخدم المعرف نفسه عند إعادة الطلب بسبب انقطاع الاتصال حتى لا يتكرر العد.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع event_id وtype بقيمة click وrecorded.
+
+  تكون recorded بقيمة true عند تسجيل الحدث أول مرة، وfalse إذا كان إعادة للحدث نفسه.
+
+  مثال:
+
+  {"code":200,"message":"تم تسجيل تفاعلك مع الإعلان.","data":{"event_id":"b19bb48e-f0cd-42ec-a303-64cf0a8198a3","type":"click","recorded":true}}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب Bearer token صالح.
+
+  HTTP 404 إذا كان الإعلان غير موجود أو متوقفًا أو خارج موعد العرض أو تابعًا لمتجر غير متاح.
+
+  HTTP 422 إذا كان event_id مفقودًا أو ليس UUID صالحًا، أو استُخدم المعرف نفسه لإعلان أو تفاعل آخر.

@@ -1,0 +1,101 @@
+info:
+  name: تحويل إلى صديق
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{user_ur}}/wallet/transfers"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  body:
+    type: multipart-form
+    data:
+      - name: recipient
+        type: text
+        value: "01012345678"
+        description: مطلوب. البريد الإلكتروني أو رقم الهاتف المسجل للمستلم.
+      - name: amount
+        type: text
+        value: "100.00"
+        description: مطلوب. مبلغ لا يقل عن 1، بمنزلتين عشريتين كحد أقصى، ولا يتجاوز الرصيد المتاح.
+      - name: idempotency_key
+        type: text
+        value: 6a034437-2d73-4db0-9d11-18152a14a953
+        description: مطلوب. UUID فريد للعملية؛ أعد استخدامه مع البيانات نفسها عند إعادة المحاولة.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يحوّل مبلغًا مباشرة من محفظة الحساب الحالي إلى حساب مستخدم أو متجر آخر.
+
+  ينشئ الخادم حركة خصم للمرسل وحركة إضافة للمستلم داخل معاملة قاعدة بيانات واحدة.
+
+  ## عنوان الطلب
+
+  POST {{general_url}}/wallet/transfers
+
+  يستخدم الطلب متغير المجموعة general_url وقيمته الحالية http://127.0.0.1:8000/api.
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لحساب مسجل، ويرثه من إعدادات المجموعة.
+
+  ## Headers
+
+  Accept (مطلوب): application/json.
+
+  Accept-Language (اختياري): ar أو en لتحديد لغة الرسائل وأخطاء التحقق.
+
+  Content-Type: يضيفه Bruno تلقائيًا بصيغة multipart/form-data مع boundary المناسب.
+
+  ## Path Parameters
+
+  لا يحتوي هذا المسار على معاملات path.
+
+  ## Query Parameters
+
+  لا يحتاج هذا الطلب إلى معاملات query.
+
+  ## Body (multipart-form)
+
+  recipient (text، مطلوب): البريد الإلكتروني أو رقم الهاتف المسجل للمستلم. يقبل البريد الإلكتروني أو رقم الهاتف المحلي المسجل، ويمكن إرسال الرقم الدولي مع رمز الدولة. يجب أن يحدد حسابًا نشطًا واحدًا فقط.
+
+  amount (text، مطلوب): المبلغ بعملة المحفظة. يجب ألا يقل عن 1، ويقبل حتى منزلتين عشريتين، وألا يتجاوز الرصيد المتاح أو 999999999999.99. لا ترسل currency؛ يستخدم الخادم عملة المحفظة ويتطلب تطابق عملة المحفظتين.
+
+  idempotency_key (UUID، مطلوب): مفتاح فريد للعملية. أعد استخدام المفتاح والبيانات نفسها عند إعادة محاولة الطلب شبكيًا؛ سيعيد الخادم نتيجة التحويل نفسها دون خصم جديد. استخدم مفتاح UUID جديدًا لعملية تحويل أخرى.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع id عام لحركة المرسل، وبيانات اسم المستلم، والمبلغ والعملة وحالة الحركة ورصيد المرسل قبل التحويل وبعده ووقت التنفيذ.
+
+  تكون الحالة completed عند نجاح التحويل.
+
+  قيم WalletTransactionStatusEnum هي pending (قيد التنفيذ) وcompleted (مكتمل) وfailed (فشل) وreversed (تم عكسه)؛ لا يعيد هذا المسار إلا الحالة completed عند النجاح.
+
+  مثال: {"code":200,"data":{"id":"a42983cd-e665-4f7f-97cd-d8b6b7cdbeea","recipient":{"name":"أحمد علي"},"amount":"100.00","currency":"EGP","status":"completed","balance_before":"500.00","balance_after":"400.00","completed_at":"2026-10-17T10:00:00+03:00"},"message":"تم تحويل الرصيد بنجاح."}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب Bearer token أو عدم صلاحيته.
+
+  HTTP 422 إذا كان recipient مفقودًا أو ليس بريدًا صالحًا أو رقم هاتف بالشكل المقبول.
+
+  HTTP 422 إذا لم يعثر الخادم على حساب نشط واحد فقط بهذه البيانات، أو كان الحساب هو حساب المرسل نفسه.
+
+  HTTP 422 إذا كان amount مفقودًا أو غير رقمي أو أقل من 1 أو يحتوي أكثر من منزلتين عشريتين أو يتجاوز الرصيد المتاح.
+
+  HTTP 422 إذا اختلفت عملة محفظة المرسل عن عملة محفظة المستلم أو تجاوز رصيد المستلم الحد المسموح.
+
+  HTTP 422 إذا لم يكن idempotency_key بصيغة UUID صالحة أو استُخدم سابقًا مع مستلم أو مبلغ مختلف.

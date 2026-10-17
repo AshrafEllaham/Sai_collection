@@ -43,6 +43,10 @@ docs: |-
   يعرض الإعلانات التي حالتها نشطة وموعد بدايتها قد حل وموعد انتهائها لم يمر، لمتجر محدد.
   تكون النتائج مرتبة من الأحدث إلى الأقدم ومقسمة إلى صفحات.
 
+  تستخدم صفحة المتجر نفس النتائج لفتح عارض إعلان بملء الشاشة؛ السحب لأسفل يعرض الإعلان التالي.
+
+  يُسجل الظهور عند عرض نصف البطاقة، وتسجل النقرة عند فتح الإعلان أو تنفيذ زر الإجراء.
+
   ## عنوان الطلب
 
   GET {{user_ur}}/stores/{store}/ads
@@ -88,12 +92,15 @@ docs: |-
   - placement: موضع الإعلان؛ القيم home للرئيسية، category للقسم، storefront لواجهة المتجر.
   - action: الإجراء؛ view_product لعرض المنتج، view_store لعرض المتجر، start_chat لبدء محادثة، buy_now للشراء.
   - media_type: نوع الوسيط؛ image صورة، video فيديو، file ملف.
-  - media_path: رابط الوسيط.
+  - media_path وmedia_url: رابط الوسيط. media_url متوافق مع شكل الإعلانات الممولة ويستخدمه عارض الإعلان.
+  - target: يحتوي معرّف المتجر والمنتج والقسم المرتبطين بالإعلان.
+  - store: بيانات المتجر اللازمة لعرض اسمه وصورته داخل عارض الإعلانات.
   - starts_at وends_at: بداية الإعلان ونهايته، وقد تكون أي منهما null.
+  - starts_at_iso وends_at_iso: المواعيد بصيغة ISO 8601 لاستخدامها في ترتيب الإعلانات ومقارنة أوقات الحملات، وقد تكون أي منهما null.
 
   مثال:
 
-  {"code":200,"message":"تم جلب إعلانات المتجر النشطة بنجاح.","data":[{"id":12,"public_id":"c8467125-57ac-4b5e-9c1c-2b10d21f4cb1","product_id":7,"category_id":null,"title":"تشكيلة جديدة","action_label":"تسوق الآن","caption":"اكتشف أحدث المنتجات","placement":"storefront","action":"buy_now","media_type":"image","media_path":"https://example.test/storage/ads/new-collection.jpg","starts_at":null,"ends_at":"2026-10-20 12:00 PM"}],"current_page":1,"last_page":2,"per_page":6,"total":8}
+  {"code":200,"message":"تم جلب إعلانات المتجر النشطة بنجاح.","data":[{"id":12,"public_id":"c8467125-57ac-4b5e-9c1c-2b10d21f4cb1","product_id":7,"category_id":null,"title":"تشكيلة جديدة","action_label":"تسوق الآن","caption":"اكتشف أحدث المنتجات","placement":"storefront","action":"buy_now","media_type":"image","media_path":"https://example.test/storage/ads/new-collection.jpg","media_url":"https://example.test/storage/ads/new-collection.jpg","target":{"store_id":4,"product_id":7,"category_id":null},"store":{"id":4,"owner_id":21,"name":"متجر التقنية","avatar":null,"cover":null},"starts_at":"2026-10-17 08:00 AM","ends_at":"2026-10-20 12:00 PM","starts_at_iso":"2026-10-17T08:00:00+02:00","ends_at_iso":"2026-10-20T12:00:00+02:00"}],"current_page":1,"last_page":2,"per_page":6,"total":8}
 
   ## أخطاء مهمة
 

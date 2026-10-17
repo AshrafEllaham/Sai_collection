@@ -1,0 +1,82 @@
+info:
+  name: تسجيل مشاهدة إعلان
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{user_ur}}/ads/12/impressions"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  params:
+    - name: ad
+      value: "12"
+      type: path
+      description: مطلوب. المعرّف الرقمي للإعلان النشط الذي ظهر للمستخدم.
+  body:
+    type: multipart-form
+    data:
+      - name: event_id
+        type: text
+        value: 1c534d43-6f14-43cb-bbfd-06193dcc78fd
+        description: مطلوب. UUID فريد لهذا الظهور؛ أعد استخدامه عند إعادة محاولة الحدث نفسه لمنع احتسابه مرتين.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يسجل ظهور الإعلان للمستخدم ويزيد عداد مرات الظهور اليومية مرة واحدة فقط لمعرّف الحدث.
+
+  يرسل التطبيق الطلب عندما يظهر نصف كارد الإعلان على الأقل داخل الشاشة.
+
+  ## عنوان الطلب
+
+  POST {{user_ur}}/ads/{ad}/impressions
+
+  قيمة user_ur في المجموعة: http://127.0.0.1:8000/api/user
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لمستخدم مسجل الدخول، ويرثه الطلب من إعدادات المجموعة.
+
+  ## Headers
+
+  Accept (مطلوب): application/json.
+
+  Accept-Language (اختياري): ar أو en لتحديد لغة الرسالة وأخطاء التحقق.
+
+  ## Path parameter
+
+  ad (مطلوب): المعرّف الرقمي للإعلان. يجب أن يكون الإعلان نشطًا وضمن موعد عرضه ومتجره نشطًا.
+
+  ## Body (multipart-form)
+
+  event_id (مطلوب): UUID فريد لحدث الظهور. استخدم المعرف نفسه عند إعادة الطلب بسبب انقطاع الاتصال حتى لا يتكرر العد.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع event_id وtype بقيمة impression وrecorded.
+
+  تكون recorded بقيمة true عند تسجيل الحدث أول مرة، وfalse إذا كان إعادة للحدث نفسه.
+
+  مثال:
+
+  {"code":200,"message":"تم تسجيل تفاعلك مع الإعلان.","data":{"event_id":"1c534d43-6f14-43cb-bbfd-06193dcc78fd","type":"impression","recorded":true}}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب Bearer token صالح.
+
+  HTTP 404 إذا كان الإعلان غير موجود أو متوقفًا أو خارج موعد العرض أو تابعًا لمتجر غير متاح.
+
+  HTTP 422 إذا كان event_id مفقودًا أو ليس UUID صالحًا، أو استُخدم المعرف نفسه لإعلان أو تفاعل آخر.

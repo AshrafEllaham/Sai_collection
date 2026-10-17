@@ -1,0 +1,115 @@
+info:
+  name: "عرض الإعلانات الممولة"
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{user_ur}}/ads?placement=category&category_id=3&limit_per_page=5&page=1"
+  headers:
+    - name: Accept
+      value: application/json
+    - name: Accept-Language
+      value: ar
+  params:
+    - name: placement
+      value: category
+      type: query
+      description: "مطلوب. موضع الإعلان: home للرئيسية أو category للقسم. إعلانات المتجر تُجلب من /stores/{store}/ads."
+    - name: category_id
+      value: "3"
+      type: query
+      description: مطلوب عند placement=category؛ معرّف قسم نشط. احذف هذا الحقل عند placement=home.
+    - name: limit_per_page
+      value: "5"
+      type: query
+      description: اختياري. عدد الإعلانات بالصفحة من 1 إلى 100؛ الافتراضي 5.
+    - name: page
+      value: "1"
+      type: query
+      description: اختياري. رقم الصفحة ويبدأ من 1؛ الافتراضي 1.
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  ## الغرض
+
+  يعرض الإعلانات المعتمدة النشطة أو المجدولة التي حان موعد بدايتها ولم ينته موعدها، للرئيسية أو صفحة القسم.
+
+  في الرئيسية، تُعرض بطاقة إعلان واحدة في كل مرة.
+
+  لا تظهر الحملة المجدولة قبل starts_at؛ وبعد حلول الموعد تصبح مؤهلة للعرض. تُحدّث الواجهة القائمة دوريًا، بحد أقصى دقيقة، وتعيد تحميلها عند انتهاء الحملة الحالية.
+
+  ## عنوان الطلب
+
+  GET {{user_ur}}/ads?placement=category&category_id=3
+
+  قيمة user_ur في المجموعة: http://127.0.0.1:8000/api/user
+
+  ## المصادقة
+
+  يتطلب Bearer token صالحًا لمستخدم مسجل الدخول، ويرثه الطلب من إعدادات المجموعة.
+
+  ## Headers
+
+  Accept (مطلوب): application/json.
+
+  Accept-Language (اختياري): ar أو en لتحديد لغة الرسالة.
+
+  ## Query parameters
+
+  placement (مطلوب): موضع الإعلانات.
+
+  home: إعلانات الرئيسية.
+
+  category: إعلانات صفحة القسم.
+
+  category_id (مطلوب عند placement=category): معرّف القسم النشط المطلوب عرض إعلاناته. يطابق إما القسم المحدد في الإعلان، أو قسم المتجر عندما لا يحدد الإعلان قسمًا بعينه.
+
+  لا ترسل category_id مع placement=home.
+
+  storefront غير مقبول هنا؛ إعلانات متجر محدد تُجلب عبر GET {{user_ur}}/stores/{store}/ads، مع تمرير معرّف المتجر في المسار.
+
+  limit_per_page (اختياري): عدد الإعلانات من 1 إلى 100؛ الافتراضي 5.
+
+  page (اختياري): رقم الصفحة ويبدأ من 1؛ الافتراضي 1.
+
+  تقسيم النتائج إلى صفحات مفعّل دائمًا.
+
+  ## Body
+
+  لا يوجد body لهذا الطلب.
+
+  ## الاستجابة الناجحة
+
+  HTTP 200 مع قائمة data وبيانات الصفحات.
+
+  كل إعلان مؤهل يعرض id وpublic_id وtitle وcaption وaction_label وplacement وaction وmedia_type وmedia_url وtarget وبيانات المتجر وموعدي البداية والنهاية.
+
+  placement: home للرئيسية أو category للقسم.
+
+  action: view_product لعرض المنتج، view_store لعرض المتجر، start_chat لبدء محادثة، buy_now للشراء.
+
+  media_type: image لصورة، video لفيديو، file لملف.
+
+  مثال:
+
+  {"code":200,"message":"تم جلب الإعلانات المتاحة بنجاح.","data":[{"id":12,"public_id":"c8467125-57ac-4b5e-9c1c-2b10d21f4cb1","title":"خصم على الإلكترونيات","caption":"اكتشف أحدث المنتجات","action_label":"تسوّق الآن","placement":"home","action":"view_product","media_type":"video","media_url":"https://example.test/storage/ads/electronics.mp4","target":{"store_id":4,"product_id":7,"category_id":null},"store":{"id":4,"owner_id":21,"name":"التقنية الحديثة","avatar":null,"cover":null},"starts_at":"2026-10-17T08:00:00+02:00","ends_at":"2026-10-24T08:00:00+02:00"}],"current_page":1,"last_page":1,"per_page":5,"total":1}
+
+  ## أخطاء مهمة
+
+  HTTP 401 عند غياب Bearer token صالح.
+
+  HTTP 422 إذا كان placement غير موجود أو ليس إحدى القيم home أو category.
+
+  HTTP 422 إذا غاب category_id مع placement=category، أو كان القسم غير نشط أو غير موجود.
+
+  HTTP 422 إذا أُرسل category_id مع placement=home.
+
+  HTTP 422 إذا كان limit_per_page خارج النطاق 1 إلى 100 أو كان page أقل من 1.
